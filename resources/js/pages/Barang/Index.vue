@@ -10,7 +10,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const props = defineProps({
+defineProps({
     data_barang: {
         type: Array,
         required: true,
@@ -42,7 +42,7 @@ function deleteItem(id){
                     <td>Jumlah</td>
                     <td>Aksi</td>
                 </thead>
-                <tbody v-for="data_siswa in data_siswa" :key="data_barang.id">
+                <tbody v-for="data_barang in data_barang" :key="data_barang.id">
                     <td>{{ data_barang.nama_barang }}</td>
                     <td>{{ data_barang.gambar }}</td>
                     <td>{{ data_barang.jumlah }}</td>

@@ -13,8 +13,8 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const proops = defineProps({
-    data_siswa: {
+defineProps({
+    data_barang: {
         type: Array,
         required: true,
     },
@@ -59,7 +59,7 @@ function submit() {
                         <Label for="gambar">Gambar</Label>
                         <Input
                             id="nama"
-                            type="file"
+                            type="text"
                             class="mt-1 block w-full"
                             v-model="form.gambar"
                             placeholder="Nama"

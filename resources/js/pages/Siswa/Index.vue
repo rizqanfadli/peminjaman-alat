@@ -10,7 +10,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const props = defineProps({
+defineProps({
     data_siswa: {
         type: Array,
         required: true,

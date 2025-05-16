@@ -32,7 +32,7 @@ class BarangController extends Controller
      */
     public function store(Request $request)
     {
-        
+        //
     }
 
     /**
