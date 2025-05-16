@@ -22,7 +22,7 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Data Barang',
         href: '/barang',
-        icon: LayoutGrid,
+        icon: Folder,
     },
     {
         title: 'Data Siswa',

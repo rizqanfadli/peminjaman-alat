@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DataBarang;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class BarangController extends Controller
 {
@@ -11,7 +13,10 @@ class BarangController extends Controller
      */
     public function index()
     {
-        //
+        $data_barang = DataBarang::all();
+        return Inertia::render('Barang/Index', [
+            'data_barang' => $data_barang,
+        ]);
     }
 
     /**
@@ -19,7 +24,7 @@ class BarangController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Barang/Create');
     }
 
     /**
@@ -27,7 +32,7 @@ class BarangController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
     }
 
     /**
