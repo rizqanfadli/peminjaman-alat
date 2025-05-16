@@ -10,7 +10,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const proops = defineProps({
+const props = defineProps({
     data_barang: {
         type: Array,
         required: true,
