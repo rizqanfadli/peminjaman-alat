@@ -44,10 +44,10 @@ function deleteItem(id){
                 </thead>
                 <tbody v-for="data_barang in data_barang" :key="data_barang.id">
                     <td>{{ data_barang.nama_barang }}</td>
-                    <td>{{ data_barang.gambar }}</td>
-                    <td>{{ data_barang.jumlah }}</td>
+                    <td>{{ data_barang.gambar_barang }}</td>
+                    <td>{{ data_barang.jumlah_barang }}</td>
                     <td>
-                        <Link :href="`/siswa/${data_barang.id}/edit`">Edit</Link>
+                        <Link :href="`/barang/${data_barang.id}/edit`">Edit</Link>
                         <button @click="deleteItem(data_barang.id)">Delete</button>
                     </td>
                 </tbody>

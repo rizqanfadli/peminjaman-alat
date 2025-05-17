@@ -21,9 +21,9 @@ defineProps({
 });
 
 const form = useForm({
-    nama: '',
-    gambar: '',
-    jumlah: '',
+    nama_barang: '',
+    gambar_barang: '',
+    jumlah_barang: '',
 });
 
 function submit() {
@@ -45,37 +45,37 @@ function submit() {
             </div>
             <form @submit.prevent="submit">
                 <div class="grid gap-2">
-                        <Label for="nis">Nama Barang</Label>
+                        <Label for="nama_barang">Nama Barang</Label>
                         <Input
                             id="nama_barang"
                             type="text"
                             class="mt-1 block w-full"
-                            v-model="form.nis"
+                            v-model="form.nama_barang"
                             placeholder="Nama Barang"
                         />
                         <InputError class="mt-2" :message="form.errors.nama_barang" />
                      </div>
                 <div class="grid gap-2">
-                        <Label for="gambar">Gambar</Label>
+                        <Label for="gambar_barang">Gambar</Label>
                         <Input
-                            id="nama"
+                            id="gambar_barang"
                             type="text"
                             class="mt-1 block w-full"
-                            v-model="form.gambar"
+                            v-model="form.gambar_barang"
                             placeholder="Nama"
                         />
-                        <InputError class="mt-2" :message="form.errors.gambar" />
+                        <InputError class="mt-2" :message="form.errors.gambar_barang" />
                      </div>
                 <div class="grid gap-2">
-                       <Label for="jumlah">Jumlah:</Label>
+                       <Label for="jumlah_barang">Jumlah:</Label>
                        <Input
-                           id="kelas"
+                           id="jumlah_barang"
                            type="number"
                            class="mt-1 block w-full"
-                           v-model="form.jumlah"
+                           v-model="form.jumlah_barang"
                            placeholder="jumlah"
                        />
-                       <InputError class="mt-2" :message="form.errors.jumlah" />
+                       <InputError class="mt-2" :message="form.errors.jumlah_barang" />
                     </div>
                     <div class="flex items-center gap-4">
                        <Button>Submit</Button>

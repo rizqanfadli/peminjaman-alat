@@ -32,7 +32,18 @@ class BarangController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nama_barang' => 'required',
+            'gambar_barang' => 'required',
+            'jumlah_barang' => 'required',
+        ]);
+
+        DataBarang::create([
+            'nama_barang' => $request->nama_barang,
+            'gambar_barang' => $request->gambar_barang,
+            'jumlah_barang' => $request->jumlah_barang,
+        ]);
+        return redirect()->route('barang.index')->with('success', 'Data Siswa berhasil ditambahkan');
     }
 
     /**
@@ -48,7 +59,10 @@ class BarangController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $data_barang = DataBarang::find($id);
+        return Inertia::render('Barang/Edit', [
+            'data_barang' => $data_barang,
+        ]);
     }
 
     /**
@@ -56,7 +70,19 @@ class BarangController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'nama_barang' => 'required',
+            'gambar_barang' => 'required',
+            'jumlah_barang' => 'required',
+        ]);
+
+        $data_barang = DataBarang::find($id);
+        $data_barang->nama_barang = $request->nama_barang;
+        $data_barang->gambar_barang = $request->gambar_barang;
+        $data_barang->jumlah_barang = $request->jumlah_barang;
+        $data_barang->save();
+
+        return redirect()->route('barang.index');
     }
 
     /**
