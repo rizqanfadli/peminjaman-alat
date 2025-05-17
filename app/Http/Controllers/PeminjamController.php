@@ -24,7 +24,7 @@ class PeminjamController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Peminjam/Create');
     }
 
     /**
@@ -32,7 +32,22 @@ class PeminjamController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nama_siswa' => 'required',
+            'kelas' => 'required',
+            'nama_barang' => 'required',
+            'jumlah_barang' => 'required',
+            'keterangan' => 'nullable',
+        ]);
+
+        Peminjam::create([
+            'nama_siswa' => $request->nama_siswa,
+            'kelas' => $request->kelas,
+            'nama_barang' => $request->nama_barang,
+            'jumlah_barang' => $request->jumlah_barang,
+            'keterangan' => $request->keterangan,
+        ]);
+        return redirect()->route('siswa.index')->with('success', 'Data Siswa berhasil ditambahkan');
     }
 
     /**
