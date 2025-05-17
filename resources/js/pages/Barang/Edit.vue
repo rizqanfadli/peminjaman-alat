@@ -61,17 +61,6 @@ function submit() {
                     <InputError class="mt-2" :message="form.errors.nama_barang" />
                 </div>
                 <div class="grid gap-2">
-                    <Label for="gambar_barang">Gambar Barang</Label>
-                    <Input
-                        id="gambar_barang"
-                        type="text"
-                        class="mt-1 block w-full"
-                        v-model="form.gambar_barang"
-                        placeholder="Nama"
-                    />
-                    <InputError class="mt-2" :message="form.errors.gambar_barang" />
-                </div>
-                <div class="grid gap-2">
                     <Label for="jumlah_barang">Jumlah Barang:</Label>
                     <Input
                         id="jumlah_barang"
