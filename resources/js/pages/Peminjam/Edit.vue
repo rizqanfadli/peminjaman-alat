@@ -9,9 +9,11 @@ import { Button } from '@/components/ui/button'; // Tambahkan import Button
 
 interface Peminjam {
     id: number;
-    nis: string | number;
-    nama: string;
+    nama_siswa: string;
     kelas: string;
+    nama_barang: string;
+    jumlah_barang: string;
+    keterangan: string;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -22,7 +24,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const props = defineProps<{
-    peminjam: peminjam
+    peminjam: Peminjam
 }>();
 
 const form = useForm({
