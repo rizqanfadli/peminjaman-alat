@@ -38,8 +38,10 @@ function deleteItem(id){
             <table>
                 <thead>
                     <td>Nama peminjam</td>
-                    <td>Gambar</td>
+                    <td>Kelas</td>
+                    <td>Nama Barang</td>
                     <td>Jumlah</td>
+                    <td>keterangan</td>
                     <td>Aksi</td>
                 </thead>
                 <tbody v-for="peminjam in peminjam" :key="peminjam.id">
