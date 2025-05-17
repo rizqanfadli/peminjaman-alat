@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Peminjam;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class PeminjamController extends Controller
 {
@@ -11,7 +13,10 @@ class PeminjamController extends Controller
      */
     public function index()
     {
-        //
+        $peminjam = Peminjam::all();
+        return Inertia::render('Peminjam/Index', [
+            'peminjam' => $peminjam,
+        ]);
     }
 
     /**
