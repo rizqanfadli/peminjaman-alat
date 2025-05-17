@@ -5,6 +5,7 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button'; // Tambahkan import Button
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -13,18 +14,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-defineProps({
-    data_peminjam: {
-        type: Array,
-        required: true,
-    },
-});
-
 const form = useForm({
     nama_siswa: '',
     kelas: '',
     nama_barang: '',
-    jumlah_barang: '',
+    jumlah_barang: '', // Sesuaikan dengan nama field di controller
     keterangan: '',
 });
 
@@ -33,7 +27,6 @@ function submit() {
         preserveScroll: true,
         onSuccess: () => form.reset(),
     });
-    
 }
 </script>
 
@@ -80,15 +73,15 @@ function submit() {
                         <InputError class="mt-2" :message="form.errors.kelas" />
                      </div>
                 <div class="grid gap-2">
-                       <Label for="jumlah_peminjam">Jumlah:</Label>
+                       <Label for="jumlah_barang">Jumlah:</Label>
                        <Input
-                           id="jumlah_peminjam"
+                           id="jumlah_barang"
                            type="number"
                            class="mt-1 block w-full"
-                           v-model="form.jumlah_peminjam"
+                           v-model="form.jumlah_barang"
                            placeholder="jumlah"
                        />
-                       <InputError class="mt-2" :message="form.errors.jumlah_peminjam" />
+                       <InputError class="mt-2" :message="form.errors.jumlah_barang" />
                     </div>
                 <div class="grid gap-2">
                        <Label for="keterangan">keterangan:</Label>
@@ -102,8 +95,8 @@ function submit() {
                        <InputError class="mt-2" :message="form.errors.keterangan" />
                     </div>
                     <div class="flex items-center gap-4">
-                       <Button>Submit</Button>
-                   </div>
+                    <Button type="submit">Submit</Button>
+                </div>
 
             </form>
         </div>
