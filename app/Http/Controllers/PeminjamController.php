@@ -34,7 +34,7 @@ class PeminjamController extends Controller
     {
         $request->validate([
             'nama_siswa' => 'required',
-            'kelas' => 'required',
+            'kelas' => 'required', 
             'nama_barang' => 'required',
             'jumlah_barang' => 'required',
             'keterangan' => 'nullable',
@@ -47,7 +47,8 @@ class PeminjamController extends Controller
             'jumlah_barang' => $request->jumlah_barang,
             'keterangan' => $request->keterangan,
         ]);
-        return redirect()->route('siswa.index')->with('success', 'Data Siswa berhasil ditambahkan');
+
+        return redirect()->route('peminjam.index')->with('success', 'Data peminjaman berhasil ditambahkan');
     }
 
     /**
@@ -63,7 +64,10 @@ class PeminjamController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $peminjam = Peminjam::find($id);
+        return Inertia::render('Peminjam/Edit', [
+            'peminjam' => $peminjam,
+        ]);
     }
 
     /**
@@ -71,7 +75,24 @@ class PeminjamController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'nama_siswa' => 'required',
+            'kelas' => 'required', 
+            'nama_barang' => 'required',
+            'jumlah_barang' => 'required',
+            'keterangan' => 'nullable',
+        ]);
+
+        $peminjam = Peminjam::find($id);
+        $peminjam->nama_siswa = $request->nama_siswa;
+        $peminjam->kelas = $request->kelas;
+        $peminjam->nama_barang = $request->nama_barang;
+        $peminjam->jumlah_barang = $request->jumlah_barang;
+        $peminjam->keterangan = $request->keterangan;
+        $peminjam->save();
+
+        return redirect()->route('peminjam.index');
+
     }
 
     /**

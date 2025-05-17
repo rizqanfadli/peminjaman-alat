@@ -10,8 +10,8 @@ class Peminjam extends Model
     protected $fillable = [
         'nama_siswa',
         'kelas',
-        'nama_barang',
+        'nama_barang', 
         'jumlah_barang',
-        'keterangan',
+        'keterangan'
     ];
 }
