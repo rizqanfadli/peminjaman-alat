@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BarangController;
+use App\Http\Controllers\FormController;
 use App\Http\Controllers\PeminjamController;
 use App\Http\Controllers\SiswaController;
 use Illuminate\Support\Facades\Route;
@@ -24,4 +25,4 @@ require __DIR__.'/auth.php';
 Route::resource('peminjam', PeminjamController::class);
 Route::resource('siswa', SiswaController::class);
 Route::resource('barang', BarangController::class);
-
+Route::resource('form', FormController::class);

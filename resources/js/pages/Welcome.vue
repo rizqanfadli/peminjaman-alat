@@ -4,6 +4,9 @@ import InputError from '@/components/InputError.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { ref } from 'vue';
+
+const showAlert = ref(false);
 
 const form = useForm({
     nama_siswa: '',
@@ -14,9 +17,15 @@ const form = useForm({
 });
 
 function submit() {
-    form.post(route('peminjam.store'), {
+    form.post(route('form.store'), {
         preserveScroll: true,
-        onSuccess: () => form.reset(),
+        onSuccess: () => {
+            form.reset();
+            showAlert.value = true;
+            setTimeout(() => {
+                showAlert.value = false;
+            }, 9000); // Hide alert after 9 seconds
+        },
     });
 }
 </script>
@@ -135,6 +144,10 @@ function submit() {
                                 </Button>
                             </div>
                         </form>
+
+                        <div v-if="showAlert" class="mt-4 p-4 rounded-lg bg-green-100 text-green-800 border border-green-300">
+                            Data berhasil dikirim!
+                        </div>
                     </div>
                 </div>
             </div>
@@ -151,6 +164,46 @@ function submit() {
 </template>
 
 <style scoped>
+/* Input styling fixes */
+input, select, textarea {
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+    background-color: transparent !important;
+}
+
+/* Remove autofill background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
+    -webkit-text-fill-color: #111827 !important;
+    -webkit-background-clip: text !important;
+    background-color: transparent !important;
+}
+
+/* Fix placeholder color */
+input::placeholder, 
+select::placeholder, 
+textarea::placeholder {
+    color: #6B7280 !important;
+    -webkit-text-fill-color: #6B7280 !important;
+    opacity: 1;
+}
+
+/* Fix selection highlight */
+input::selection,
+textarea::selection {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Gradient animation */
 .bg-gradient-to-r {
     background-size: 200% 200%;
     animation: gradient 15s ease infinite;
