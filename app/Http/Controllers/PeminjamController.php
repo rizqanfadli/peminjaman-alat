@@ -100,6 +100,9 @@ class PeminjamController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $peminjam = Peminjam::find($id);
+        $peminjam->delete();
+
+        return redirect()->route('peminjam.index');
     }
 }
