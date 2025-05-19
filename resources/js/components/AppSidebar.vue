@@ -5,29 +5,34 @@ import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { Folder, LayoutGrid } from 'lucide-vue-next';
+import { 
+    LayoutDashboard, 
+    ClipboardList, 
+    PackageSearch, 
+    Users 
+} from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: '/admin',
-        icon: LayoutGrid,
+        icon: LayoutDashboard, // Dashboard icon
     },
     {
-        title: 'Peminjaman',
+        title: 'Peminjam',
         href: '/peminjam',
-        icon: LayoutGrid,
+        icon: ClipboardList, // Clipboard/list icon for borrowing
     },
     {
         title: 'Data Barang',
         href: '/barang',
-        icon: Folder,
+        icon: PackageSearch, // Package/inventory icon
     },
     {
         title: 'Data Siswa',
         href: '/siswa',
-        icon: LayoutGrid,
+        icon: Users, // Users/people icon
     },
 ];
 
