@@ -7,9 +7,7 @@ use App\Http\Controllers\SiswaController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome');
-})->name('home');
+Route::get('/', [FormController::class, 'index'])->name('home');
 
 Route::get('admin', function () {
     return Inertia::render('Dashboard');
@@ -26,3 +24,7 @@ Route::resource('peminjam', PeminjamController::class);
 Route::resource('siswa', SiswaController::class);
 Route::resource('barang', BarangController::class);
 Route::resource('form', FormController::class);
+
+// API untuk dropdown
+Route::get('/api/siswa', fn() => \App\Models\DataSiswa::all())->name('api.siswa');
+Route::get('/api/barang', fn() => \App\Models\DataBarang::all())->name('api.barang');
