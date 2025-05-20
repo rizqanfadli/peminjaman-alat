@@ -28,3 +28,7 @@ Route::resource('form', FormController::class);
 // API untuk dropdown
 Route::get('/api/siswa', fn() => \App\Models\DataSiswa::all())->name('api.siswa');
 Route::get('/api/barang', fn() => \App\Models\DataBarang::all())->name('api.barang');
+
+Route::get('/data_siswa', function () {
+    return response()->json(['success' => true]);
+});
