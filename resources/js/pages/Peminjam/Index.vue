@@ -10,16 +10,22 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-defineProps({
-    peminjam: {
-        type: Array,
-        required: true,
-    },
-});
+interface Peminjam {
+    id: number;
+    nama_siswa: string;
+    kelas: string;
+    nama_barang: string;
+    jumlah_barang: number;
+    keterangan: string;
+}
 
-const form = useForm();
+const props = defineProps<{
+    peminjam: Peminjam[];
+}>();
 
-function deleteItem(id) {
+const form = useForm({});
+
+function deleteItem(id: number) {
     if (confirm('Apakah anda yakin akan menghapus ini?')) {
         form.delete(route('peminjam.destroy', id), {
             preserveScroll: true,
@@ -50,13 +56,13 @@ function deleteItem(id) {
                             <th class="px-6 py-3">Nama Peminjam</th>
                             <th class="px-6 py-3">Kelas</th>
                             <th class="px-6 py-3">Nama Barang</th>
-                            <th class="px-6 py-3">Jumlah</th>
+                            <th class="px-6 py-3">Jumlah Barang</th>
                             <th class="px-6 py-3">Keterangan</th>
                             <th class="px-6 py-3">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="p in peminjam" :key="p.id" class="border-b transition hover:bg-blue-50">
+                        <tr v-for="p in props.peminjam" :key="p.id" class="border-b transition hover:bg-blue-50">
                             <td class="px-6 py-4">{{ p.id }}</td>
                             <td class="px-6 py-4">{{ p.nama_siswa }}</td>
                             <td class="px-6 py-4">{{ p.kelas }}</td>
