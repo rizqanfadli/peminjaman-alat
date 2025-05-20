@@ -8,7 +8,7 @@ import { onMounted, ref, watch } from 'vue';
 const props = defineProps<{
     dataSiswa: Array<{ id: number; nis: string; nama: string; kelas: string }>;
     dataBarang: Array<{ id: number; nama_barang: string; jumlah_barang: number }>;
-    form: any;
+    // form: any;
 }>();
 
 const showAlert = ref(false);

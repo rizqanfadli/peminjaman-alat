@@ -169,9 +169,9 @@ const rightNavItems: NavItem[] = [
                                 class="focus-within:ring-primary relative size-10 w-auto rounded-full p-1 focus-within:ring-2"
                             >
                                 <Avatar class="size-8 overflow-hidden rounded-full">
-                                    <AvatarImage v-if="auth.value.user.avatar" :src="auth.value.user.avatar" :alt="auth.value.user.name" />
+                                    <AvatarImage v-if="auth.user?.avatar" :src="auth.user?.avatar" :alt="auth.user?.name" />
                                     <AvatarFallback class="rounded-lg bg-neutral-200 font-semibold text-black dark:bg-neutral-700 dark:text-white">
-                                        {{ getInitials(auth.value.user?.name) }}
+                                        {{ getInitials(auth.user?.name) }}
                                     </AvatarFallback>
                                 </Avatar>
                             </Button>
