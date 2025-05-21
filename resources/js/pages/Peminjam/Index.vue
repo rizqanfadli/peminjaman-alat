@@ -34,14 +34,28 @@ const statusOptions = [
 ];
 
 const search = ref('');
+const startDate = ref('');
+const endDate = ref('');
+const showDateRangeModal = ref(false);
 
 const filteredPeminjam = computed(() => {
     const keyword = search.value.toLowerCase();
-    return props.peminjam.filter((peminjam) =>
-        peminjam.nama_siswa.toLowerCase().includes(keyword) ||
-        peminjam.kelas.toLowerCase().includes(keyword) ||
-        peminjam.nama_barang.toLowerCase().includes(keyword)
-    );
+    return props.peminjam.filter((peminjam) => {
+        // Filter berdasarkan keyword
+        const matchesKeyword = peminjam.nama_siswa.toLowerCase().includes(keyword) ||
+            peminjam.kelas.toLowerCase().includes(keyword) ||
+            peminjam.nama_barang.toLowerCase().includes(keyword);
+
+        // Filter berdasarkan rentang tanggal
+        const peminjamDate = new Date(peminjam.tanggal_peminjaman);
+        const start = startDate.value ? new Date(startDate.value) : null;
+        const end = endDate.value ? new Date(endDate.value) : null;
+        
+        const matchesDateRange = (!start || peminjamDate >= start) && 
+                               (!end || peminjamDate <= end);
+
+        return matchesKeyword && matchesDateRange;
+    });
 });
 
 function deleteItem(id: number) {
@@ -73,12 +87,12 @@ function exportToCSV() {
         'Status'
     ].join(';');
 
-    // Data rows
+    // Menggunakan filteredPeminjam yang sudah terfilter
     const csvRows = filteredPeminjam.value.map((peminjam, index) => {
         return [
             index + 1,
             peminjam.nama_siswa,
-            peminjam.kelas,
+            peminjam.kelas,           // Menambahkan kelas yang sebelumnya terlewat
             peminjam.tanggal_peminjaman,
             peminjam.nama_barang,
             peminjam.jumlah_barang,
@@ -86,6 +100,13 @@ function exportToCSV() {
             peminjam.status
         ].join(';');
     });
+
+    // Menambahkan informasi filter ke nama file
+    let fileName = 'data-peminjam';
+    if (startDate.value && endDate.value) {
+        fileName += `-${startDate.value}-to-${endDate.value}`;
+    }
+    fileName += '.csv';
 
     // Gabungkan header dan rows
     const csvString = [csvHeader, ...csvRows].join('\n');
@@ -97,13 +118,23 @@ function exportToCSV() {
     
     // Set properti link untuk mengunduh
     link.setAttribute('href', url);
-    link.setAttribute('download', `data-peminjam-${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', fileName);
     link.style.visibility = 'hidden';
     
     // Tambahkan ke document, klik, dan hapus
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+}
+
+function clearDateFilter() {
+    startDate.value = '';
+    endDate.value = '';
+    showDateRangeModal.value = false;
+}
+
+function applyDateFilter() {
+    showDateRangeModal.value = false;
 }
 </script>
 
@@ -122,6 +153,69 @@ function exportToCSV() {
                         placeholder="Cari nama/kelas/barang..."
                         class="rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-gray-400"
                     />
+                    
+                    <!-- Tombol Filter Tanggal -->
+                    <div class="relative">
+                        <button
+                            @click="showDateRangeModal = true"
+                            class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white shadow-md transition hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400"
+                        >
+                            Filter Tanggal
+                            <span v-if="startDate && endDate" class="text-xs">
+                                ({{ startDate }} - {{ endDate }})
+                            </span>
+                        </button>
+
+                        <!-- Modal akan muncul di sini -->
+                    </div>
+
+                    <!-- Modal Filter Tanggal (Ubah bagian ini) -->
+                    <div v-if="showDateRangeModal" class="absolute right-0 top-12 z-50">
+                        <div class="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-xl border border-gray-200 dark:border-slate-700 w-80">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Filter Rentang Tanggal</h3>
+                                <button 
+                                    @click="showDateRangeModal = false"
+                                    class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Dari Tanggal</label>
+                                    <input
+                                        v-model="startDate"
+                                        type="date"
+                                        class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:bg-slate-700 dark:text-white dark:border-slate-600"
+                                    />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Sampai Tanggal</label>
+                                    <input
+                                        v-model="endDate"
+                                        type="date"
+                                        class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:bg-slate-700 dark:text-white dark:border-slate-600"
+                                    />
+                                </div>
+                                <div class="flex justify-end gap-2 mt-4">
+                                    <button
+                                        @click="clearDateFilter"
+                                        class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg dark:text-gray-300 dark:hover:bg-slate-700"
+                                    >
+                                        Reset
+                                    </button>
+                                    <button
+                                        @click="applyDateFilter"
+                                        class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400"
+                                    >
+                                        Terapkan
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <button
                         @click="exportToCSV"
                         class="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-white shadow-md transition hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400"
