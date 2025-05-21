@@ -11,11 +11,19 @@ class BarangController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data_barang = DataBarang::all();
+        $query = DataBarang::query();
+        
+        if ($request->has('nama_barang')) {
+            $search = $request->nama_barang;
+            $query->where('nama_barang', 'LIKE', "%{$search}%");
+        }
+        
+        $data_barang = $query->get();
+        
         return Inertia::render('Barang/Index', [
-            'data_barang' => $data_barang,
+            'data_barang' => $data_barang
         ]);
     }
 
