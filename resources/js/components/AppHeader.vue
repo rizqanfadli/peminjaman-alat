@@ -30,7 +30,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const page = usePage();
-const auth = computed(() => page.props.auth);
+const auth = computed(() => page.props.auth as { user?: { name?: string; avatar?: string } });
 
 const isCurrentRoute = computed(() => (url: string) => page.url === url);
 
@@ -177,7 +177,7 @@ const rightNavItems: NavItem[] = [
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" class="w-56">
-                            <UserMenuContent :user="auth.user" />
+                            <UserMenuContent :user="auth.user ?? { name: '', avatar: '' }" />
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
