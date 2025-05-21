@@ -32,3 +32,4 @@ Route::get('/api/barang', fn() => \App\Models\DataBarang::all())->name('api.bara
 Route::get('/data_siswa', function () {
     return response()->json(['success' => true]);
 });
+Route::patch('peminjam/{peminjam}/update-status', [PeminjamController::class, 'updateStatus'])->name('peminjam.updateStatus');

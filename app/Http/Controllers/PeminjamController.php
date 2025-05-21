@@ -11,16 +11,10 @@ class PeminjamController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
-        $query = Peminjam::query();
         
-        if ($request->has('nama_siswa')) {
-            $search = $request->nama_siswa;
-            $query->where('nama_siswa', 'LIKE', "%{$search}%");
-        }
-        
-        $peminjam = $query->get();
+        $peminjam = Peminjam::get();
         
         return Inertia::render('Peminjam/Index', [
             'peminjam' => $peminjam
@@ -43,17 +37,21 @@ class PeminjamController extends Controller
         $request->validate([
             'nama_siswa' => 'required',
             'kelas' => 'required', 
+            'tanggal_peminjaman' => 'required', 
             'nama_barang' => 'required',
             'jumlah_barang' => 'required',
             'keterangan' => 'nullable',
+            'status' => 'required',
         ]);
 
         Peminjam::create([
             'nama_siswa' => $request->nama_siswa,
             'kelas' => $request->kelas,
+            'tanggal_peminjaman' => $request->tanggal_peminjaman,
             'nama_barang' => $request->nama_barang,
             'jumlah_barang' => $request->jumlah_barang,
             'keterangan' => $request->keterangan,
+            'status' => $request->status,
         ]);
 
         return redirect()->route('peminjam.index')->with('success', 'Data peminjaman berhasil ditambahkan');
@@ -86,17 +84,21 @@ class PeminjamController extends Controller
         $request->validate([
             'nama_siswa' => 'required',
             'kelas' => 'required', 
+            'tanggal_peminjaman' => 'required', 
             'nama_barang' => 'required',
             'jumlah_barang' => 'required',
             'keterangan' => 'nullable',
+            'status' => 'required',
         ]);
 
         $peminjam = Peminjam::find($id);
         $peminjam->nama_siswa = $request->nama_siswa;
         $peminjam->kelas = $request->kelas;
+        $peminjam->tanggal_peminjaman = $request->tanggal_peminjaman;
         $peminjam->nama_barang = $request->nama_barang;
         $peminjam->jumlah_barang = $request->jumlah_barang;
         $peminjam->keterangan = $request->keterangan;
+        $peminjam->status = $request->status;
         $peminjam->save();
 
         return redirect()->route('peminjam.index');
@@ -112,5 +114,22 @@ class PeminjamController extends Controller
         $peminjam->delete();
 
         return redirect()->route('peminjam.index');
+    }
+
+    /**
+     * Update the status of the specified resource.
+     */
+    public function updateStatus(Request $request, Peminjam $peminjam)
+    {
+        $validated = $request->validate([
+            'status' => ['required', 'string', 'in:Dipinjam,Sudah Dikembalikan'],
+        ]);
+
+        $peminjam->update([
+            'status' => $validated['status']
+        ]);
+
+        return redirect()->back()
+            ->with('message', 'Status berhasil diperbarui');
     }
 }

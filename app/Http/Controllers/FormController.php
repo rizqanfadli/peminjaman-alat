@@ -32,6 +32,7 @@ class FormController extends Controller
         $request->validate([
             'nama_siswa' => 'required',
             'kelas' => 'required',
+            'tanggal_peminjaman' => 'required',
             'nama_barang' => 'required',
             'jumlah_pinjam' => 'required|integer|min:1',
             'keterangan' => 'nullable',
@@ -54,6 +55,7 @@ class FormController extends Controller
         Peminjam::create([
             'nama_siswa' => $request->nama_siswa,
             'kelas' => $request->kelas,
+            'tanggal_peminjaman' => $request->tanggal_peminjaman,
             'nama_barang' => $request->nama_barang,
             'jumlah_barang' => $request->jumlah_pinjam,  // simpan jumlah pinjam
             'keterangan' => $request->keterangan,

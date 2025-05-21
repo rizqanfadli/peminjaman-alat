@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('nama_siswa');
             $table->string('kelas');
+            $table->date('tanggal_peminjaman');
             $table->string('nama_barang');
             $table->integer('jumlah_barang');
             $table->string('keterangan')->nullable();
+            $table->string('status')->default('Dipinjam');
             $table->timestamps();
         });
     }

@@ -13,24 +13,34 @@ interface Peminjam {
     id: number;
     nama_siswa: string;
     kelas: string;
+    tanggal_peminjaman: Date;
     nama_barang: string;
     jumlah_barang: number;
     keterangan: string;
+    status: string;
 }
 
 const props = defineProps<{
     peminjam: Peminjam[];
 }>();
 
-const form = useForm({});
+const form = useForm({
+    status: '',
+});
+
+const statusOptions = [
+    { value: 'Dipinjam', label: 'Dipinjam' },
+    { value: 'Sudah Dikembalikan', label: 'Sudah Dikembalikan' },
+];
+
 const search = ref('');
 
 const filteredPeminjam = computed(() => {
     const keyword = search.value.toLowerCase();
-    return props.peminjam.filter((p) =>
-        p.nama_siswa.toLowerCase().includes(keyword) ||
-        p.kelas.toLowerCase().includes(keyword) ||
-        p.nama_barang.toLowerCase().includes(keyword)
+    return props.peminjam.filter((peminjam) =>
+        peminjam.nama_siswa.toLowerCase().includes(keyword) ||
+        peminjam.kelas.toLowerCase().includes(keyword) ||
+        peminjam.nama_barang.toLowerCase().includes(keyword)
     );
 });
 
@@ -40,6 +50,60 @@ function deleteItem(id: number) {
             preserveScroll: true,
         });
     }
+}
+
+function updateStatus(id: number, newStatus: string) {
+    form.status = newStatus;
+    form.patch(route('peminjam.updateStatus', id), {
+        preserveScroll: true,
+        preserveState: true,
+    });
+}
+
+function exportToCSV() {
+    // Header untuk CSV
+    const csvHeader = [
+        'No',
+        'Nama Peminjam',
+        'Kelas',
+        'Tanggal Peminjaman',
+        'Nama Barang',
+        'Jumlah',
+        'Keterangan',
+        'Status'
+    ].join(';');
+
+    // Data rows
+    const csvRows = filteredPeminjam.value.map((peminjam, index) => {
+        return [
+            index + 1,
+            peminjam.nama_siswa,
+            peminjam.kelas,
+            peminjam.tanggal_peminjaman,
+            peminjam.nama_barang,
+            peminjam.jumlah_barang,
+            peminjam.keterangan,
+            peminjam.status
+        ].join(';');
+    });
+
+    // Gabungkan header dan rows
+    const csvString = [csvHeader, ...csvRows].join('\n');
+
+    // Buat Blob dan unduh file
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    // Set properti link untuk mengunduh
+    link.setAttribute('href', url);
+    link.setAttribute('download', `data-peminjam-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    // Tambahkan ke document, klik, dan hapus
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 </script>
 
@@ -58,6 +122,12 @@ function deleteItem(id: number) {
                         placeholder="Cari nama/kelas/barang..."
                         class="rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-gray-400"
                     />
+                    <button
+                        @click="exportToCSV"
+                        class="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-white shadow-md transition hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400"
+                    >
+                        Export CSV
+                    </button>
                     <Link
                         href="/peminjam/create"
                         class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white shadow-md transition hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400"
@@ -75,34 +145,53 @@ function deleteItem(id: number) {
                             <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">No</th>
                             <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">Nama Peminjam</th>
                             <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">Kelas</th>
+                            <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">Tanggal Peminjaman</th>
                             <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">Nama Barang</th>
                             <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">Jumlah</th>
                             <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">Keterangan</th>
+                            <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">Status</th>
                             <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr
-                            v-for="(p, index) in filteredPeminjam"
-                            :key="p.id"
+                            v-for="(peminjam, index) in filteredPeminjam"
+                            :key="peminjam.id"
                             class="transition hover:bg-blue-50 dark:hover:bg-slate-700"
                         >
                             <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ index + 1 }}</td>
-                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ p.nama_siswa }}</td>
-                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ p.kelas }}</td>
-                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ p.nama_barang }}</td>
-                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ p.jumlah_barang }}</td>
-                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ p.keterangan }}</td>
+                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ peminjam.nama_siswa }}</td>
+                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ peminjam.kelas }}</td>
+                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ peminjam.tanggal_peminjaman }}</td>
+                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ peminjam.nama_barang }}</td>
+                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ peminjam.jumlah_barang }}</td>
+                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ peminjam.keterangan }}</td>
+                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">
+                                <select
+                                    :value="peminjam.status"
+                                    @change="updateStatus(peminjam.id, ($event.target as HTMLSelectElement).value)"
+                                    class="rounded-lg border border-gray-300 px-3 py-1 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:bg-slate-700 dark:text-white dark:border-slate-600"
+                                >
+                                    <option
+                                        v-for="option in statusOptions"
+                                        :key="option.value"
+                                        :value="option.value"
+                                        :selected="peminjam.status === option.value"
+                                    >
+                                        {{ option.label }}
+                                    </option>
+                                </select>
+                            </td>
                             <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">
                                 <div class="flex justify-center items-center gap-2">
                                     <Link
-                                        :href="`/peminjam/${p.id}/edit`"
+                                        :href="`/peminjam/${peminjam.id}/edit`"
                                         class="inline-flex items-center gap-1 rounded bg-yellow-500 px-3 py-1 text-white shadow transition hover:bg-yellow-600 dark:bg-yellow-400 dark:hover:bg-yellow-500"
                                     >
                                         <Pencil class="h-4 w-4" /> Edit
                                     </Link>
                                     <button
-                                        @click="deleteItem(p.id)"
+                                        @click="deleteItem(peminjam.id)"
                                         class="inline-flex items-center gap-1 rounded bg-red-600 px-3 py-1 text-white shadow transition hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
                                     >
                                         <Trash2 class="h-4 w-4" /> Hapus

@@ -26,8 +26,7 @@ const filteredSiswa = computed(() => {
     const keyword = search.value.toLowerCase();
     return props.data_siswa.filter((siswa) =>
         siswa.nama.toLowerCase().includes(keyword) ||
-        siswa.nis.toLowerCase().includes(keyword) ||
-        siswa.kelas.toLowerCase().includes(keyword)
+        siswa.kelas.toLowerCase().includes(keyword) 
     );
 });
 
@@ -55,7 +54,7 @@ function deleteItem(id: number) {
                     <input
                         v-model="search"
                         type="search"
-                        placeholder="Cari nama/NIS/kelas..."
+                        placeholder="Cari nama/kelas..."
                         class="rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-gray-400"
                     />
                     <Link

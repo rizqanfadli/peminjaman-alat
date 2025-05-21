@@ -18,6 +18,7 @@ const form = useForm({
     nama_siswa: '',
     kelas: '',
     nama_barang: '',
+    tanggal_peminjaman: new Date().toISOString().slice(0, 10),
     jumlah_pinjam: '', // diganti dari jumlah_barang jadi jumlah_pinjam
     keterangan: '',
 });
@@ -145,7 +146,17 @@ function updateHtmlClass() {
                             />
                             <InputError class="mt-1" :message="form.errors.kelas" />
                         </div>
-
+                        <div>
+                            <Label for="tanggal_peminjaman">Tanggal Peminjaman</Label>
+                            <input
+                                id="tanggal_peminjaman"
+                                type="date"
+                                v-model="form.tanggal_peminjaman"
+                                class="mt-1 block w-full rounded-md border border-blue-200 bg-white p-2 text-gray-800 focus:border-blue-500 focus:ring focus:ring-blue-100 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"
+                                required
+                            />
+                            <InputError class="mt-1" :message="form.errors.tanggal_peminjaman" />
+                        </div>
                         <div>
                             <Label for="nama_barang">Nama Barang</Label>
                             <select

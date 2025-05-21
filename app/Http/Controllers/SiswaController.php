@@ -11,16 +11,9 @@ class SiswaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
-        $query = DataSiswa::query();
-        
-        if ($request->has('nama')) {
-            $search = $request->nama;
-            $query->where('nama', 'LIKE', "%{$search}%");
-        }
-        
-        $data_siswa = $query->get();
+    public function index()
+    {        
+        $data_siswa = DataSiswa::get();
         
         return Inertia::render('Siswa/Index', [
             'data_siswa' => $data_siswa,
