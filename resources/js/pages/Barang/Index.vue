@@ -2,7 +2,6 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { Pencil, Trash2 } from 'lucide-vue-next'; // Icon edit & hapus
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -11,7 +10,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-// Define the type for a single barang item
 interface Barang {
     id: number;
     nama_barang: string;
@@ -22,7 +20,16 @@ defineProps<{
     data_barang: Barang[];
 }>();
 
-const form = useForm();
+const form = useForm({
+    nama_barang: ''
+});
+
+function handleSearch() {
+    form.get(route('barang.index'), {
+        preserveScroll: true,
+        preserveState: true
+    });
+}
 
 function deleteItem(id: number) {
     if (confirm('Apakah anda yakin akan menghapus ini?')) {
@@ -37,23 +44,61 @@ function deleteItem(id: number) {
     <Head title="Data Barang" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <Link href="/barang/create">Create</Link>
-            <table>
-                <thead>
-                    <td>Nama Barang</td>
-                    <td>Jumlah</td>
-                    <td>Aksi</td>
-                </thead>
-                <tbody v-for="data_barang in data_barang" :key="data_barang.id">
-                    <td>{{ data_barang.nama_barang }}</td>
-                    <td>{{ data_barang.jumlah_barang }}</td>
-                    <td>
-                        <Link :href="`/barang/${data_barang.id}/edit`">Edit</Link>
-                        <button @click="deleteItem(data_barang.id)">Delete</button>
-                    </td>
-                </tbody>
-            </table>
+        <div class="flex min-h-screen flex-col gap-6 rounded-xl bg-gradient-to-br from-blue-50 via-white to-blue-100 p-6 shadow-lg">
+            <!-- Header -->
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-semibold text-blue-800">Data Barang</h1>
+                <Link href="/barang/create" class="inline-block rounded-lg bg-blue-600 px-4 py-2 text-white shadow transition hover:bg-blue-700">
+                    + Tambah Barang
+                </Link>
+            </div>
+
+            <!-- Search -->
+            <div class="w-full">
+                <form @submit.prevent="handleSearch" class="flex gap-2">
+                    <input 
+                        type="search" 
+                        v-model="form.nama_barang" 
+                        placeholder="Cari nama barang..." 
+                        class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
+                    />
+                    <button 
+                        type="submit" 
+                        class="rounded-lg bg-blue-600 px-4 py-2 text-white shadow transition hover:bg-blue-700"
+                    >
+                        Cari
+                    </button>
+                </form>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto rounded-xl bg-white shadow-md">
+                <table class="min-w-full text-left text-sm text-gray-700">
+                    <thead class="bg-blue-100 text-sm text-blue-700 uppercase">
+                        <tr>
+                            <th class="px-6 py-3">No</th>
+                            <th class="px-6 py-3">Nama Barang</th>
+                            <th class="px-6 py-3">Jumlah</th>
+                            <th class="px-6 py-3">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(barang, index) in data_barang" :key="barang.id" class="border-b transition hover:bg-blue-50">
+                            <td class="px-6 py-4">{{ index + 1 }}</td>
+                            <td class="px-6 py-4">{{ barang.nama_barang }}</td>
+                            <td class="px-6 py-4">{{ barang.jumlah_barang }}</td>
+                            <td class="space-x-2 px-6 py-4">
+                                <Link :href="`/barang/${barang.id}/edit`" class="text-blue-600 hover:underline">
+                                    Edit
+                                </Link>
+                                <button @click="deleteItem(barang.id)" class="text-red-600 hover:underline">
+                                    Hapus
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </AppLayout>
 </template>
