@@ -355,7 +355,7 @@ onUnmounted(() => {
                         </div>
 
                         <div>
-                            <Label for="jumlah_pinjam">Jumlah Pinjam (stok tersedia)</Label>
+                            <Label for="jumlah_pinjam">Jumlah Pinjam</Label>
                             <input
                                 id="jumlah_pinjam"
                                 type="number"
@@ -369,7 +369,7 @@ onUnmounted(() => {
                         </div>
 
                         <div>
-                            <Label for="keterangan">Keterangan (opsional)</Label>
+                            <Label for="keterangan">Keterangan</Label>
                             <textarea
                                 id="keterangan"
                                 v-model="form.keterangan"
