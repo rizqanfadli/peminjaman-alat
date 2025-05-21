@@ -51,6 +51,7 @@ function deleteItem(id: number) {
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <h1 class="text-2xl font-semibold text-blue-800 dark:text-white">Data Siswa</h1>
                 <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+                    <!-- Pastikan ada v-model di sini -->
                     <input
                         v-model="search"
                         type="search"
@@ -79,6 +80,7 @@ function deleteItem(id: number) {
                         </tr>
                     </thead>
                     <tbody>
+                        <!-- Pakai filteredSiswa di v-for -->
                         <tr
                             v-for="(siswa, index) in filteredSiswa"
                             :key="siswa.id"

@@ -93,7 +93,7 @@ function submit() {
                         class="flex items-center gap-2 text-blue-600 transition hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                     >
                         <ArrowLeft class="h-5 w-5" />
-                        <span class="font-semibold">Back</span>
+                        <span class="font-semibold">Kembali</span>
                     </Link>
 
                     <Button
