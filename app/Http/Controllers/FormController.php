@@ -3,82 +3,62 @@
 namespace App\Http\Controllers;
 
 use App\Models\Peminjam;
+use App\Models\DataSiswa;
+use App\Models\DataBarang;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class FormController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $peminjam = Peminjam::all();
-        return inertia('Welcome', [
-            'form' => $peminjam,
+        // Ambil data siswa dan barang dari tabel masing-masing
+        $dataSiswa = DataSiswa::all();
+        $dataBarang = DataBarang::all();
+
+        // Ambil data peminjaman juga kalau perlu (misal untuk daftar peminjam)
+        $form = Peminjam::all();
+
+        // Kirim data ke Inertia untuk dipakai di Welcome.vue
+        return Inertia::render('Welcome', [
+            'dataSiswa' => $dataSiswa,
+            'dataBarang' => $dataBarang,
+            'form' => $form,
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
             'nama_siswa' => 'required',
-            'kelas' => 'required', 
+            'kelas' => 'required',
             'nama_barang' => 'required',
-            'jumlah_barang' => 'required',
+            'jumlah_pinjam' => 'required|integer|min:1',
             'keterangan' => 'nullable',
         ]);
 
+        // Cek stok barang tersedia
+        $barang = DataBarang::where('nama_barang', $request->nama_barang)->first();
+        if (!$barang) {
+            return back()->withErrors(['nama_barang' => 'Barang tidak ditemukan']);
+        }
+        if ($barang->jumlah_barang < $request->jumlah_pinjam) {
+            return back()->withErrors(['jumlah_pinjam' => 'Jumlah pinjam melebihi stok barang']);
+        }
+
+        // Kurangi stok barang
+        $barang->jumlah_barang -= $request->jumlah_pinjam;
+        $barang->save();
+
+        // Simpan data peminjaman
         Peminjam::create([
             'nama_siswa' => $request->nama_siswa,
             'kelas' => $request->kelas,
             'nama_barang' => $request->nama_barang,
-            'jumlah_barang' => $request->jumlah_barang,
+            'jumlah_barang' => $request->jumlah_pinjam,  // simpan jumlah pinjam
             'keterangan' => $request->keterangan,
         ]);
 
-        return redirect()->route('form.index')->with('success', 'Data peminjaman berhasil ditambahkan');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('form.index')->with('success', 'Peminjaman berhasil disimpan.');
     }
 }
