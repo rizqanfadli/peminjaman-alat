@@ -11,11 +11,19 @@ class PeminjamController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $peminjam = Peminjam::all();
+        $query = Peminjam::query();
+        
+        if ($request->has('nama_siswa')) {
+            $search = $request->nama_siswa;
+            $query->where('nama_siswa', 'LIKE', "%{$search}%");
+        }
+        
+        $peminjam = $query->get();
+        
         return Inertia::render('Peminjam/Index', [
-            'peminjam' => $peminjam,
+            'peminjam' => $peminjam
         ]);
     }
 

@@ -23,7 +23,16 @@ const props = defineProps<{
     peminjam: Peminjam[];
 }>();
 
-const form = useForm({});
+const form = useForm({
+    nama_siswa: ''  // Add search form
+});
+
+function handleSearch() {
+    form.get(route('peminjam.index'), {
+        preserveScroll: true,
+        preserveState: true
+    });
+}
 
 function deleteItem(id: number) {
     if (confirm('Apakah anda yakin akan menghapus ini?')) {
@@ -45,6 +54,24 @@ function deleteItem(id: number) {
                 <Link href="/peminjam/create" class="inline-block rounded-lg bg-blue-600 px-4 py-2 text-white shadow transition hover:bg-blue-700">
                     + Tambah Peminjam
                 </Link>
+            </div>
+
+            <!-- Search -->
+            <div class="w-full">
+                <form @submit.prevent="handleSearch" class="flex gap-2">
+                    <input 
+                        type="search" 
+                        v-model="form.nama_siswa" 
+                        placeholder="Cari nama peminjam..." 
+                        class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
+                    />
+                    <button 
+                        type="submit" 
+                        class="rounded-lg bg-blue-600 px-4 py-2 text-white shadow transition hover:bg-blue-700"
+                    >
+                        Cari
+                    </button>
+                </form>
             </div>
 
             <!-- Table -->
