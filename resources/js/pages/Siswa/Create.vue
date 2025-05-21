@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { ArrowLeft, PlusCircle } from 'lucide-vue-next';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -39,35 +40,67 @@ function submit() {
     <Head title="Tambah Siswa" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="dark:bg-muted flex flex-col gap-6 rounded-xl bg-white p-6 shadow-sm">
-            <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold tracking-tight">Form Tambah Siswa</h2>
-                <Link href="/siswa">
-                    <Button variant="outline">← Kembali</Button>
-                </Link>
-            </div>
-
+        <div
+            class="mx-auto w-full max-w-4xl rounded-xl border border-blue-200 bg-gradient-to-b from-blue-50 via-white to-white p-8 shadow-md transition dark:border-gray-700 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 dark:text-gray-100"
+        >
             <form @submit.prevent="submit" class="space-y-6">
-                <div class="grid gap-2">
-                    <Label for="nis">NIS</Label>
-                    <Input id="nis" type="number" v-model="form.nis" placeholder="Masukkan NIS" />
-                    <InputError class="text-sm text-red-500" :message="form.errors.nis" />
+                <!-- NIS -->
+                <div>
+                    <Label for="nis" class="font-semibold text-blue-700 dark:text-blue-300">NIS</Label>
+                    <Input
+                        id="nis"
+                        type="number"
+                        class="mt-1 block w-full appearance-none rounded-md border border-blue-300 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                        v-model="form.nis"
+                        placeholder="Masukkan NIS"
+                    />
+                    <InputError class="mt-2 text-red-600 dark:text-red-400" :message="form.errors.nis" />
                 </div>
 
-                <div class="grid gap-2">
-                    <Label for="nama">Nama</Label>
-                    <Input id="nama" type="text" v-model="form.nama" placeholder="Masukkan Nama" />
-                    <InputError class="text-sm text-red-500" :message="form.errors.nama" />
+                <!-- Nama -->
+                <div>
+                    <Label for="nama" class="font-semibold text-blue-700 dark:text-blue-300">Nama</Label>
+                    <Input
+                        id="nama"
+                        type="text"
+                        class="mt-1 block w-full rounded-md border border-blue-300 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                        v-model="form.nama"
+                        placeholder="Masukkan nama siswa"
+                    />
+                    <InputError class="mt-2 text-red-600 dark:text-red-400" :message="form.errors.nama" />
                 </div>
 
-                <div class="grid gap-2">
-                    <Label for="kelas">Kelas</Label>
-                    <Input id="kelas" type="text" v-model="form.kelas" placeholder="Contoh: XII TJKT 2" />
-                    <InputError class="text-sm text-red-500" :message="form.errors.kelas" />
+                <!-- Kelas -->
+                <div>
+                    <Label for="kelas" class="font-semibold text-blue-700 dark:text-blue-300">Kelas</Label>
+                    <Input
+                        id="kelas"
+                        type="text"
+                        class="mt-1 block w-full rounded-md border border-blue-300 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                        v-model="form.kelas"
+                        placeholder="Contoh: XII TJKT 2"
+                    />
+                    <InputError class="mt-2 text-red-600 dark:text-red-400" :message="form.errors.kelas" />
                 </div>
 
-                <div class="pt-4">
-                    <Button type="submit" class="w-full bg-blue-600 hover:bg-blue-700">Simpan</Button>
+                <!-- Tombol -->
+                <div class="mt-8 flex items-center justify-between">
+                    <Link
+                        href="/siswa"
+                        class="flex items-center gap-2 text-blue-600 transition hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                    >
+                        <ArrowLeft class="h-5 w-5" />
+                        <span class="font-semibold">Kembali</span>
+                    </Link>
+
+                    <Button
+                        type="submit"
+                        class="flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2 font-semibold text-white shadow-md transition hover:bg-blue-700 active:scale-95 dark:bg-blue-500 dark:hover:bg-blue-400"
+                        :disabled="form.processing"
+                    >
+                        <PlusCircle class="h-5 w-5" />
+                        Simpan
+                    </Button>
                 </div>
             </form>
         </div>

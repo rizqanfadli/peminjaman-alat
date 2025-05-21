@@ -2,12 +2,11 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Pencil, Trash2 } from 'lucide-vue-next';
+import { ref, computed } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Data peminjam',
-        href: '/peminjam',
-    },
+    { title: 'Data Peminjam', href: '/peminjam' },
 ];
 
 interface Peminjam {
@@ -23,16 +22,17 @@ const props = defineProps<{
     peminjam: Peminjam[];
 }>();
 
-const form = useForm({
-    nama_siswa: ''  // Add search form
-});
+const form = useForm({});
+const search = ref('');
 
-function handleSearch() {
-    form.get(route('peminjam.index'), {
-        preserveScroll: true,
-        preserveState: true
-    });
-}
+const filteredPeminjam = computed(() => {
+    const keyword = search.value.toLowerCase();
+    return props.peminjam.filter((p) =>
+        p.nama_siswa.toLowerCase().includes(keyword) ||
+        p.kelas.toLowerCase().includes(keyword) ||
+        p.nama_barang.toLowerCase().includes(keyword)
+    );
+});
 
 function deleteItem(id: number) {
     if (confirm('Apakah anda yakin akan menghapus ini?')) {
@@ -44,61 +44,75 @@ function deleteItem(id: number) {
 </script>
 
 <template>
-    <Head title="Data" />
+    <Head title="Data Peminjam" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex min-h-screen flex-col gap-6 rounded-xl bg-gradient-to-br from-blue-50 via-white to-blue-100 p-6 shadow-lg">
+        <div class="flex min-h-screen flex-col gap-6 rounded-xl bg-gradient-to-br from-blue-50 via-white to-blue-100 p-6 shadow-lg dark:from-slate-800 dark:via-slate-900 dark:to-slate-800 font-[Poppins]">
             <!-- Header -->
-            <div class="flex items-center justify-between">
-                <h1 class="text-2xl font-semibold text-blue-800">Data Peminjam</h1>
-                <Link href="/peminjam/create" class="inline-block rounded-lg bg-blue-600 px-4 py-2 text-white shadow transition hover:bg-blue-700">
-                    + Tambah Peminjam
-                </Link>
-            </div>
-
-            <!-- Search -->
-            <div class="w-full">
-                <form @submit.prevent="handleSearch" class="flex gap-2">
-                    <input 
-                        type="search" 
-                        v-model="form.nama_siswa" 
-                        placeholder="Cari nama peminjam..." 
-                        class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <h1 class="text-2xl font-semibold text-blue-800 dark:text-white">Data Peminjam</h1>
+                <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+                    <input
+                        v-model="search"
+                        type="text"
+                        placeholder="Cari nama/kelas/barang..."
+                        class="rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-gray-400"
                     />
-                    <button 
-                        type="submit" 
-                        class="rounded-lg bg-blue-600 px-4 py-2 text-white shadow transition hover:bg-blue-700"
+                    <Link
+                        href="/peminjam/create"
+                        class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white shadow-md transition hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400"
                     >
-                        Cari
-                    </button>
-                </form>
+                        + Tambah Peminjam
+                    </Link>
+                </div>
             </div>
 
             <!-- Table -->
-            <div class="overflow-x-auto rounded-xl bg-white shadow-md">
-                <table class="min-w-full text-left text-sm text-gray-700">
-                    <thead class="bg-blue-100 text-sm text-blue-700 uppercase">
+            <div class="overflow-x-auto rounded-xl bg-white shadow-md dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
+                <table class="min-w-full table-auto text-sm text-gray-700 dark:text-gray-200">
+                    <thead class="bg-blue-100 text-blue-700 uppercase dark:bg-slate-700 dark:text-blue-300">
                         <tr>
-                            <th class="px-6 py-3">No</th>
-                            <th class="px-6 py-3">Nama Peminjam</th>
-                            <th class="px-6 py-3">Kelas</th>
-                            <th class="px-6 py-3">Nama Barang</th>
-                            <th class="px-6 py-3">Jumlah Barang</th>
-                            <th class="px-6 py-3">Keterangan</th>
-                            <th class="px-6 py-3">Aksi</th>
+                            <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">No</th>
+                            <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">Nama Peminjam</th>
+                            <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">Kelas</th>
+                            <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">Nama Barang</th>
+                            <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">Jumlah</th>
+                            <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">Keterangan</th>
+                            <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="p in props.peminjam" :key="p.id" class="border-b transition hover:bg-blue-50">
-                            <td class="px-6 py-4">{{ p.id }}</td>
-                            <td class="px-6 py-4">{{ p.nama_siswa }}</td>
-                            <td class="px-6 py-4">{{ p.kelas }}</td>
-                            <td class="px-6 py-4">{{ p.nama_barang }}</td>
-                            <td class="px-6 py-4">{{ p.jumlah_barang }}</td>
-                            <td class="px-6 py-4">{{ p.keterangan }}</td>
-                            <td class="space-x-2 px-6 py-4">
-                                <Link :href="`/peminjam/${p.id}/edit`" class="text-blue-600 hover:underline"> Edit </Link>
-                                <button @click="deleteItem(p.id)" class="text-red-600 hover:underline">Hapus</button>
+                        <tr
+                            v-for="(p, index) in filteredPeminjam"
+                            :key="p.id"
+                            class="transition hover:bg-blue-50 dark:hover:bg-slate-700"
+                        >
+                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ index + 1 }}</td>
+                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ p.nama_siswa }}</td>
+                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ p.kelas }}</td>
+                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ p.nama_barang }}</td>
+                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ p.jumlah_barang }}</td>
+                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ p.keterangan }}</td>
+                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">
+                                <div class="flex justify-center items-center gap-2">
+                                    <Link
+                                        :href="`/peminjam/${p.id}/edit`"
+                                        class="inline-flex items-center gap-1 rounded bg-yellow-500 px-3 py-1 text-white shadow transition hover:bg-yellow-600 dark:bg-yellow-400 dark:hover:bg-yellow-500"
+                                    >
+                                        <Pencil class="h-4 w-4" /> Edit
+                                    </Link>
+                                    <button
+                                        @click="deleteItem(p.id)"
+                                        class="inline-flex items-center gap-1 rounded bg-red-600 px-3 py-1 text-white shadow transition hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                                    >
+                                        <Trash2 class="h-4 w-4" /> Hapus
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr v-if="filteredPeminjam.length === 0">
+                            <td colspan="7" class="text-center py-4 text-gray-500 dark:text-gray-400">
+                                Tidak ada data ditemukan.
                             </td>
                         </tr>
                     </tbody>
