@@ -79,6 +79,7 @@ class BarangController extends Controller
         $data_barang->nama_barang = $request->nama_barang;
         $data_barang->jumlah_barang = $request->jumlah_barang;
         $data_barang->save();
+        
 
         return redirect()->route('barang.index');
     }

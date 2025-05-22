@@ -3,71 +3,57 @@
 namespace App\Http\Controllers;
 
 use App\Models\Peminjam;
+use App\Models\DataBarang;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class PeminjamController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        
         $peminjam = Peminjam::get();
-        
         return Inertia::render('Peminjam/Index', [
             'peminjam' => $peminjam
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return Inertia::render('Peminjam/Create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
-    {
-        $request->validate([
-            'nama_siswa' => 'required',
-            'kelas' => 'required', 
-            'tanggal_peminjaman' => 'required', 
-            'nama_barang' => 'required',
-            'jumlah_barang' => 'required',
-            'keterangan' => 'nullable',
-            'status' => 'required',
-        ]);
+{
+    $request->validate([
+        'nama_siswa' => 'required',
+        'kelas' => 'required',
+        'tanggal_peminjaman' => 'required',
+        'nama_barang' => 'required',
+        'jumlah_barang' => 'required|integer|min:1',
+        'keterangan' => 'nullable',
+        'status' => 'required',
+    ]);
 
-        Peminjam::create([
-            'nama_siswa' => $request->nama_siswa,
-            'kelas' => $request->kelas,
-            'tanggal_peminjaman' => $request->tanggal_peminjaman,
-            'nama_barang' => $request->nama_barang,
-            'jumlah_barang' => $request->jumlah_barang,
-            'keterangan' => $request->keterangan,
-            'status' => $request->status,
-        ]);
+    $barang = DataBarang::where('nama_barang', $request->nama_barang)->first();
 
-        return redirect()->route('peminjam.index')->with('success', 'Data peminjaman berhasil ditambahkan');
+    if (!$barang) {
+        return back()->withErrors(['nama_barang' => 'Barang tidak ditemukan.']);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+    if ($request->jumlah_barang > $barang->jumlah_barang) {
+        return back()->withErrors(['jumlah_barang' => 'Jumlah yang dipinjam melebihi stok yang tersedia!']);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    // Kurangi stok
+    $barang->jumlah_barang -= $request->jumlah_barang;
+    $barang->save();
+
+    Peminjam::create($request->all());
+
+    return redirect()->route('peminjam.index')->with('success', 'Data peminjaman berhasil ditambahkan');
+}
+
+
     public function edit(string $id)
     {
         $peminjam = Peminjam::find($id);
@@ -76,60 +62,81 @@ class PeminjamController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
-    {
-        $request->validate([
-            'nama_siswa' => 'required',
-            'kelas' => 'required', 
-            'tanggal_peminjaman' => 'required', 
-            'nama_barang' => 'required',
-            'jumlah_barang' => 'required',
-            'keterangan' => 'nullable',
-            'status' => 'required',
-        ]);
+{
+    $request->validate([
+        'nama_siswa' => 'required',
+        'kelas' => 'required',
+        'tanggal_peminjaman' => 'required',
+        'nama_barang' => 'required',
+        'jumlah_barang' => 'required|integer|min:1',
+        'keterangan' => 'nullable',
+        'status' => 'required',
+    ]);
 
-        $peminjam = Peminjam::find($id);
-        $peminjam->nama_siswa = $request->nama_siswa;
-        $peminjam->kelas = $request->kelas;
-        $peminjam->tanggal_peminjaman = $request->tanggal_peminjaman;
-        $peminjam->nama_barang = $request->nama_barang;
-        $peminjam->jumlah_barang = $request->jumlah_barang;
-        $peminjam->keterangan = $request->keterangan;
-        $peminjam->status = $request->status;
-        $peminjam->save();
+    $peminjam = Peminjam::findOrFail($id);
+    $barang = DataBarang::where('nama_barang', $peminjam->nama_barang)->first();
 
-        return redirect()->route('peminjam.index');
-
+    if (!$barang) {
+        return back()->withErrors(['nama_barang' => 'Barang tidak ditemukan.']);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    $selisih = $request->jumlah_barang - $peminjam->jumlah_barang;
+
+    // Cek jika perubahan melebihi stok
+    if ($selisih > 0 && $selisih > $barang->jumlah_barang) {
+        return back()->withErrors(['jumlah_barang' => 'Perubahan jumlah pinjam melebihi stok yang tersedia!']);
+    }
+
+    // Update stok
+    $barang->jumlah_barang -= $selisih;
+    $barang->save();
+
+    $peminjam->update($request->all());
+
+    return redirect()->route('peminjam.index')->with('success', 'Data peminjaman berhasil diperbarui');
+}
+
+
     public function destroy(string $id)
     {
         $peminjam = Peminjam::find($id);
+
+        // Jika belum dikembalikan, maka kembalikan stok
+        if ($peminjam->status !== 'Sudah Dikembalikan') {
+            $barang = DataBarang::where('nama_barang', $peminjam->nama_barang)->first();
+            if ($barang) {
+                $barang->jumlah_barang += $peminjam->jumlah_barang;
+                $barang->save();
+            }
+        }
+
         $peminjam->delete();
 
-        return redirect()->route('peminjam.index');
+        return redirect()->route('peminjam.index')->with('success', 'Data peminjaman berhasil dihapus');
     }
 
-    /**
-     * Update the status of the specified resource.
-     */
     public function updateStatus(Request $request, Peminjam $peminjam)
     {
-        $validated = $request->validate([
-            'status' => ['required', 'string', 'in:Dipinjam,Sudah Dikembalikan'],
-        ]);
+        $oldStatus = $peminjam->status;
+        $newStatus = $request->input('status');
+        $barang = DataBarang::where('nama_barang', $peminjam->nama_barang)->first();
 
-        $peminjam->update([
-            'status' => $validated['status']
-        ]);
+        if ($barang) {
+            if ($oldStatus === 'Dipinjam' && $newStatus === 'Sudah Dikembalikan') {
+                $barang->jumlah_barang += $peminjam->jumlah_barang;
+            }
 
-        return redirect()->back()
-            ->with('message', 'Status berhasil diperbarui');
+            if ($oldStatus === 'Sudah Dikembalikan' && $newStatus === 'Dipinjam') {
+                $barang->jumlah_barang -= $peminjam->jumlah_barang;
+            }
+
+            $barang->save();
+        }
+
+        $peminjam->status = $newStatus;
+        $peminjam->save();
+
+        return redirect()->route('peminjam.index')->with('success', 'Status dan stok barang berhasil diperbarui');
     }
 }
