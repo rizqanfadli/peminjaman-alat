@@ -14,7 +14,9 @@ const showAlert = ref(false);
 const isDarkMode = ref(false);
 const selectedKelas = ref('');
 const searchSiswa = ref('');
-const showDropdown = ref(false);
+const searchBarang = ref('');
+const showSiswaDropdown = ref(false);
+const showBarangDropdown = ref(false);
 
 let dotInterval: number | null = null;
 let starInterval: number | null = null;
@@ -28,7 +30,6 @@ const form = useForm({
     keterangan: '',
 });
 
-// Watch for changes in nama_siswa to update kelas
 watch(
     () => form.nama_siswa,
     (newVal) => {
@@ -37,22 +38,6 @@ watch(
     },
 );
 
-// Watch for changes in nama_barang to validate jumlah_pinjam
-watch(
-    () => form.nama_barang,
-    (newVal) => {
-        const barang = props.dataBarang.find((b) => b.nama_barang === newVal);
-        if (barang) {
-            if (Number(form.jumlah_pinjam) > barang.jumlah_barang) {
-                form.jumlah_pinjam = '';
-            }
-        } else {
-            form.jumlah_pinjam = '';
-        }
-    },
-);
-
-// Function to submit the form
 function submit() {
     const barang = props.dataBarang.find((b) => b.nama_barang === form.nama_barang);
     if (!barang) {
@@ -71,39 +56,60 @@ function submit() {
             setTimeout(() => (showAlert.value = false), 5000);
             selectedKelas.value = '';
             searchSiswa.value = '';
-            showDropdown.value = false;
+            searchBarang.value = '';
+            showSiswaDropdown.value = false;
+            showBarangDropdown.value = false;
         },
     });
 }
 
-// Function to filter students based on selected class and search term
 const filteredSiswa = computed(() => {
     return props.dataSiswa.filter((siswa) => {
         return siswa.kelas === selectedKelas.value && siswa.nama.toLowerCase().includes(searchSiswa.value.toLowerCase());
     });
 });
 
-// Toggle dropdown visibility on input click
-function toggleDropdown() {
+const filteredBarang = computed(() => {
+    return props.dataBarang.filter((barang) => {
+        return barang.nama_barang.toLowerCase().includes(searchBarang.value.toLowerCase());
+    });
+});
+
+function toggleSiswaDropdown() {
     if (selectedKelas.value) {
-        showDropdown.value = !showDropdown.value;
+        showSiswaDropdown.value = !showSiswaDropdown.value;
     }
 }
 
-// Select a student and close dropdown
+function toggleBarangDropdown() {
+    showBarangDropdown.value = !showBarangDropdown.value;
+}
+
 function selectSiswa(siswa: { nama: string }) {
     form.nama_siswa = siswa.nama;
     searchSiswa.value = siswa.nama;
-    showDropdown.value = false;
+    showSiswaDropdown.value = false;
 }
 
-// Close dropdown when clicking outside input or dropdown
+function selectBarang(barang: { nama_barang: string }) {
+    form.nama_barang = barang.nama_barang;
+    searchBarang.value = barang.nama_barang;
+    showBarangDropdown.value = false;
+}
+
 function handleClickOutside(event: MouseEvent) {
     const target = event.target as HTMLElement;
-    const dropdownEl = document.querySelector('.dropdown');
-    const inputEl = document.getElementById('nama_siswa_input');
-    if (dropdownEl && inputEl && !dropdownEl.contains(target) && !inputEl.contains(target)) {
-        showDropdown.value = false;
+    const siswaDropdownEl = document.querySelector('.siswa-dropdown');
+    const barangDropdownEl = document.querySelector('.barang-dropdown');
+    const siswaInputEl = document.getElementById('nama_siswa_input');
+    const barangInputEl = document.getElementById('nama_barang_input');
+
+    if (siswaDropdownEl && siswaInputEl && !siswaDropdownEl.contains(target) && !siswaInputEl.contains(target)) {
+        showSiswaDropdown.value = false;
+    }
+
+    if (barangDropdownEl && barangInputEl && !barangDropdownEl.contains(target) && !barangInputEl.contains(target)) {
+        showBarangDropdown.value = false;
     }
 }
 
@@ -111,24 +117,18 @@ function toggleTheme() {
     isDarkMode.value = !isDarkMode.value;
     localStorage.setItem('theme', isDarkMode.value ? 'dark' : 'light');
     updateHtmlClass();
-
-    // Start or stop animation based on theme
-    if (isDarkMode.value) {
-        startAnimation();
-    } else {
-        stopAnimation();
-    }
 }
 
 function updateHtmlClass() {
     if (isDarkMode.value) {
         document.documentElement.classList.add('dark');
+        startAnimation();
     } else {
         document.documentElement.classList.remove('dark');
+        stopAnimation();
     }
 }
 
-// Animation functions
 function createFloatingDot() {
     if (!isDarkMode.value) return;
 
@@ -237,11 +237,6 @@ onMounted(() => {
         isDarkMode.value = true;
     }
     updateHtmlClass();
-
-    // Start animation if dark mode is active
-    if (isDarkMode.value) {
-        setTimeout(startAnimation, 100);
-    }
 });
 
 onUnmounted(() => {
@@ -304,13 +299,13 @@ onUnmounted(() => {
                                     v-model="searchSiswa"
                                     placeholder="Cari nama siswa..."
                                     class="mt-1 block w-full rounded-md border border-blue-200 bg-white p-2 text-gray-800 focus:border-blue-500 focus:ring focus:ring-blue-100 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"
-                                    @click="toggleDropdown"
+                                    @click="toggleSiswaDropdown"
                                     @input="form.nama_siswa = searchSiswa"
                                     autocomplete="off"
                                     :readonly="!selectedKelas"
                                 />
                                 <ul
-                                    v-if="showDropdown && filteredSiswa.length > 0"
+                                    v-if="showSiswaDropdown && filteredSiswa.length > 0"
                                     class="dropdown absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-blue-200 bg-white dark:bg-gray-800"
                                 >
                                     <li
@@ -340,17 +335,30 @@ onUnmounted(() => {
 
                         <div>
                             <Label for="nama_barang">Nama Barang</Label>
-                            <select
-                                id="nama_barang"
-                                v-model="form.nama_barang"
-                                class="mt-1 block w-full rounded-md border border-blue-200 bg-white p-2 text-gray-800 focus:border-blue-500 focus:ring focus:ring-blue-100 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"
-                                required
-                            >
-                                <option value="" disabled selected>Pilih Barang</option>
-                                <option v-for="barang in dataBarang" :key="barang.id" :value="barang.nama_barang">
-                                    {{ barang.nama_barang }}
-                                </option>
-                            </select>
+                            <div class="relative">
+                                <input
+                                    id="nama_barang_input"
+                                    type="text"
+                                    v-model="searchBarang"
+                                    placeholder="Cari nama barang..."
+                                    class="mt-1 block w-full rounded-md border border-blue-200 bg-white p-2 text-gray-800 focus:border-blue-500 focus:ring focus:ring-blue-100 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"
+                                    @click="toggleBarangDropdown"
+                                    autocomplete="off"
+                                />
+                                <ul
+                                    v-if="showBarangDropdown && filteredBarang.length > 0"
+                                    class="barang-dropdown absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-blue-200 bg-white dark:bg-gray-800"
+                                >
+                                    <li
+                                        v-for="barang in filteredBarang"
+                                        :key="barang.id"
+                                        @click="selectBarang(barang)"
+                                        class="cursor-pointer p-2 hover:bg-blue-100 dark:hover:bg-gray-700"
+                                    >
+                                        {{ barang.nama_barang }} ({{ barang.jumlah_barang }} tersedia)
+                                    </li>
+                                </ul>
+                            </div>
                             <InputError class="mt-1" :message="form.errors.nama_barang" />
                         </div>
 
@@ -369,7 +377,7 @@ onUnmounted(() => {
                         </div>
 
                         <div>
-                            <Label for="keterangan">Keterangan</Label>
+                            <Label for="keterangan">Keterangan (Opsional)</Label>
                             <textarea
                                 id="keterangan"
                                 v-model="form.keterangan"
