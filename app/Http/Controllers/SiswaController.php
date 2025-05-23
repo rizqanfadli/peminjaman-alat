@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\DataSiswa;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SiswaController extends Controller
 {
@@ -91,5 +94,55 @@ class SiswaController extends Controller
         $siswa->delete();
 
         return redirect()->route('siswa.index');
+    }
+public function import(Request $request)
+{
+    $request->validate([
+        'file' => 'required|mimes:csv,txt|max:2048',
+    ]);
+
+    $file = $request->file('file');
+    $path = $file->getRealPath();
+    $csvData = file_get_contents($path);
+    $lines = explode(PHP_EOL, $csvData);
+
+    $data = [];
+    foreach ($lines as $line) {
+    // Lewati baris kosong
+    if (trim($line) === '') continue;
+
+    // $row = str_getcsv($line, ';');
+    $row = array_map(function ($value) {
+    return trim(trim($value), ',');
+}, str_getcsv($line, ';'));
+
+    // Hilangkan elemen kosong di akhir (trailing empty columns)
+    $row = array_map('trim', $row);
+    $row = array_filter($row, fn($val) => $val !== '');
+
+    // Pastikan hanya dua kolom
+    if (count($row) !== 2) {
+        continue; // Atau log error jika ingin tahu baris mana yang tidak sesuai
+    }
+
+    [$nama, $kelas] = $row;
+
+    // Tambahkan validasi konten jika perlu
+    if (empty($nama) || empty($kelas)) continue;
+
+    $data[] = [
+        'nama' => $nama,
+        'kelas' => $kelas,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ];
+}
+
+// Optionally, insert the data into the database if needed
+if (!empty($data)) {
+    DataSiswa::insert($data);
+}
+
+return redirect()->route('siswa.index')->with('success', 'Data Siswa berhasil diimpor');
     }
 }

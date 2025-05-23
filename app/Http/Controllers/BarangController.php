@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\DataBarang;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class BarangController extends Controller
 {
@@ -94,4 +97,50 @@ class BarangController extends Controller
 
         return redirect()->route('barang.index');
     }
+
+
+public function import(Request $request)
+{
+    $request->validate([
+        'file' => 'required|mimes:csv,txt|max:2048',
+    ]);
+
+    $file = $request->file('file');
+    $path = $file->getRealPath();
+    $csvData = file_get_contents($path);
+    $lines = explode(PHP_EOL, $csvData);
+
+    $data = [];
+    foreach ($lines as $line) {
+        $row = str_getcsv($line, ';');
+
+        // Lewati baris kosong
+        if (count(array_filter($row)) === 0) continue;
+
+        // Validasi jumlah kolom HARUS 2: nama_barang;jumlah_barang
+        if (count($row) !== 2) {
+            return Redirect::back()->withErrors(['file' => 'Format CSV tidak sesuai. Pastikan hanya ada 2 kolom: nama_barang;jumlah_barang']);
+        }
+        
+//         if (!is_numeric(trim($row[1]))) {
+//     return Redirect::back()->withErrors(['file' => 'Jumlah barang harus berupa angka.']);
+// }
+
+        $data[] = [
+            'nama_barang' => trim($row[0]),
+            'jumlah_barang' => (int) trim($row[1]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+    }
+
+    if (empty($data)) {
+        return Redirect::back()->withErrors(['file' => 'File kosong atau tidak memiliki data yang valid.']);
+    }
+
+    // Masukkan ke database
+    DataBarang::insert($data);
+
+    return redirect()->route('barang.index')->with('success', 'Data berhasil diimpor.');
+}
 }
