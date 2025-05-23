@@ -39,13 +39,11 @@ const showDateRangeModal = ref(false);
 const filteredPeminjam = computed(() => {
     const keyword = search.value.toLowerCase();
     return props.peminjam.filter((peminjam) => {
-        // Filter berdasarkan keyword
         const matchesKeyword =
             peminjam.nama_siswa.toLowerCase().includes(keyword) ||
             peminjam.kelas.toLowerCase().includes(keyword) ||
             peminjam.nama_barang.toLowerCase().includes(keyword);
 
-        // Filter berdasarkan rentang tanggal
         const peminjamDate = new Date(peminjam.tanggal_peminjaman);
         const start = startDate.value ? new Date(startDate.value) : null;
         const end = endDate.value ? new Date(endDate.value) : null;
@@ -76,7 +74,6 @@ function exportToCSV() {
     // Header untuk CSV
     const csvHeader = ['No', 'Nama Peminjam', 'Kelas', 'Tanggal Peminjaman', 'Nama Barang', 'Jumlah', 'Keterangan', 'Status'].join(';');
 
-    // Menggunakan filteredPeminjam yang sudah terfilter
     const csvRows = filteredPeminjam.value.map((peminjam, index) => {
         return [
             index + 1,
@@ -90,27 +87,22 @@ function exportToCSV() {
         ].join(';');
     });
 
-    // Menambahkan informasi filter ke nama file
     let fileName = 'data-peminjam';
     if (startDate.value && endDate.value) {
         fileName += `-${startDate.value}-to-${endDate.value}`;
     }
     fileName += '.csv';
 
-    // Gabungkan header dan rows
     const csvString = [csvHeader, ...csvRows].join('\n');
 
-    // Buat Blob dan unduh file
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
 
-    // Set properti link untuk mengunduh
     link.setAttribute('href', url);
     link.setAttribute('download', fileName);
     link.style.visibility = 'hidden';
 
-    // Tambahkan ke document, klik, dan hapus
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -145,7 +137,6 @@ function applyDateFilter() {
                         class="rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-gray-400"
                     />
 
-                    <!-- Tombol Filter Tanggal -->
                     <div class="relative">
                         <button
                             @click="showDateRangeModal = true"
@@ -155,10 +146,8 @@ function applyDateFilter() {
                             <span v-if="startDate && endDate" class="text-xs"> ({{ startDate }} - {{ endDate }}) </span>
                         </button>
 
-                        <!-- Modal akan muncul di sini -->
                     </div>
 
-                    <!-- Modal Filter Tanggal -->
                     <div v-if="showDateRangeModal" class="absolute top-12 right-0 z-50">
                         <div class="w-80 rounded-lg border border-gray-200 bg-white p-6 shadow-xl dark:border-slate-700 dark:bg-slate-800">
                             <div class="mb-4 flex items-center justify-between">
@@ -220,7 +209,6 @@ function applyDateFilter() {
                 </div>
             </div>
 
-            <!-- Table -->
             <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-md dark:border-slate-700 dark:bg-slate-800">
                 <table class="min-w-full table-auto text-sm text-gray-700 dark:text-gray-200">
                     <thead class="bg-blue-100 text-blue-700 uppercase dark:bg-slate-700 dark:text-blue-300">
