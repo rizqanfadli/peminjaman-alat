@@ -11,17 +11,4 @@ class DataSiswa extends Model
         'nama',
         'kelas',
     ];
-
-    // public function peminjaman()
-    // {
-    //     return $this->hasMany(Peminjam::class, 'nis', 'nis');
-    // }
-    // public function getRouteKeyName()
-    // {
-    //     return 'nis';
-    // }
-    // public function getRouteKey()
-    // {
-    //     return $this->nis;
-    // }
 }
