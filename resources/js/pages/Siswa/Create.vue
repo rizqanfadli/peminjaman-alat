@@ -23,7 +23,6 @@ defineProps({
 });
 
 const form = useForm({
-    nis: '',
     nama: '',
     kelas: '',
 });
@@ -44,19 +43,6 @@ function submit() {
             class="mx-auto w-full max-w-4xl rounded-xl border border-blue-200 bg-gradient-to-b from-blue-50 via-white to-white p-8 shadow-md transition dark:border-gray-700 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 dark:text-gray-100"
         >
             <form @submit.prevent="submit" class="space-y-6">
-                <!-- NIS -->
-                <div>
-                    <Label for="nis" class="font-semibold text-blue-700 dark:text-blue-300">NIS</Label>
-                    <Input
-                        id="nis"
-                        type="number"
-                        class="mt-1 block w-full appearance-none rounded-md border border-blue-300 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                        v-model="form.nis"
-                        placeholder="Masukkan NIS"
-                    />
-                    <InputError class="mt-2 text-red-600 dark:text-red-400" :message="form.errors.nis" />
-                </div>
-
                 <!-- Nama -->
                 <div>
                     <Label for="nama" class="font-semibold text-blue-700 dark:text-blue-300">Nama</Label>

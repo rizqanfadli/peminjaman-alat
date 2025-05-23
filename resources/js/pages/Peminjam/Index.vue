@@ -226,9 +226,9 @@ function applyDateFilter() {
                     <thead class="bg-blue-100 text-blue-700 uppercase dark:bg-slate-700 dark:text-blue-300">
                         <tr>
                             <th class="border border-gray-200 px-6 py-3 text-center dark:border-slate-700">No</th>
+                            <th class="border border-gray-200 px-6 py-3 text-center dark:border-slate-700">Tanggal Peminjaman</th>
                             <th class="border border-gray-200 px-6 py-3 text-center dark:border-slate-700">Nama Peminjam</th>
                             <th class="border border-gray-200 px-6 py-3 text-center dark:border-slate-700">Kelas</th>
-                            <th class="border border-gray-200 px-6 py-3 text-center dark:border-slate-700">Tanggal Peminjaman</th>
                             <th class="border border-gray-200 px-6 py-3 text-center dark:border-slate-700">Nama Barang</th>
                             <th class="border border-gray-200 px-6 py-3 text-center dark:border-slate-700">Jumlah</th>
                             <th class="border border-gray-200 px-6 py-3 text-center dark:border-slate-700">Keterangan</th>
@@ -243,11 +243,11 @@ function applyDateFilter() {
                             class="transition hover:bg-blue-50 dark:hover:bg-slate-700"
                         >
                             <td class="border border-gray-200 px-6 py-4 text-center align-middle dark:border-slate-700">{{ index + 1 }}</td>
-                            <td class="border border-gray-200 px-6 py-4 text-center align-middle dark:border-slate-700">{{ peminjam.nama_siswa }}</td>
-                            <td class="border border-gray-200 px-6 py-4 text-center align-middle dark:border-slate-700">{{ peminjam.kelas }}</td>
                             <td class="border border-gray-200 px-6 py-4 text-center align-middle dark:border-slate-700">
                                 {{ peminjam.tanggal_peminjaman }}
                             </td>
+                            <td class="border border-gray-200 px-6 py-4 text-center align-middle dark:border-slate-700">{{ peminjam.nama_siswa }}</td>
+                            <td class="border border-gray-200 px-6 py-4 text-center align-middle dark:border-slate-700">{{ peminjam.kelas }}</td>
                             <td class="border border-gray-200 px-6 py-4 text-center align-middle dark:border-slate-700">
                                 {{ peminjam.nama_barang }}
                             </td>

@@ -34,13 +34,11 @@ class SiswaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nis' => 'required',
             'nama' => 'required',
             'kelas' => 'required',
         ]);
 
         DataSiswa::create([
-            'nis' => $request->nis,
             'nama' => $request->nama,
             'kelas' => $request->kelas,
         ]);
@@ -72,13 +70,11 @@ class SiswaController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'nis' => 'required',
             'nama' => 'required',
             'kelas' => 'required',
         ]);
 
         $siswa = DataSiswa::find($id);
-        $siswa->nis = $request->nis;
         $siswa->nama = $request->nama;
         $siswa->kelas = $request->kelas;
         $siswa->save();

@@ -11,7 +11,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface Siswa {
     id: number;
-    nis: string;
     nama: string;
     kelas: string;
 }
@@ -72,7 +71,6 @@ function deleteItem(id: number) {
                     <thead class="bg-blue-100 text-blue-700 uppercase dark:bg-slate-700 dark:text-blue-300">
                         <tr>
                             <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">No</th>
-                            <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">NIS</th>
                             <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">Nama Siswa</th>
                             <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">Kelas</th>
                             <th class="border border-gray-200 dark:border-slate-700 px-6 py-3 text-center">Aksi</th>
@@ -86,7 +84,6 @@ function deleteItem(id: number) {
                             class="transition hover:bg-blue-50 dark:hover:bg-slate-700"
                         >
                             <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ index + 1 }}</td>
-                            <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ siswa.nis }}</td>
                             <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ siswa.nama }}</td>
                             <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">{{ siswa.kelas }}</td>
                             <td class="border border-gray-200 dark:border-slate-700 px-6 py-4 text-center align-middle">
