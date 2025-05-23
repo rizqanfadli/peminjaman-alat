@@ -4,14 +4,15 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\PeminjamController;
 use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', [FormController::class, 'index'])->name('home');
 
-Route::get('admin', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('admin', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::get('/register', function () {
     abort(404);

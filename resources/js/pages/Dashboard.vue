@@ -3,6 +3,11 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import PlaceholderPattern from '../components/PlaceholderPattern.vue';
+import ActiveBorrowersWidget from '../components/ActiveBorrowersWidget.vue';
+
+defineProps<{
+  activeBorrowers: number
+}>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -22,7 +27,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                 <div
                     class="relative aspect-video overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-md transition-all hover:shadow-lg"
                 >
-                    <PlaceholderPattern />
+                    <ActiveBorrowersWidget :initial-count="activeBorrowers" />
                 </div>
                 <div
                     class="relative aspect-video overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-md transition-all hover:shadow-lg"
