@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Link, router, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { Pencil, Trash2 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Data Siswa', href: '/siswa' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: '', href: '/siswa' }];
 
 interface FlashProps {
     success?: string;
@@ -137,6 +137,8 @@ watch(
 
 <template>
     <!-- Flash success notification -->
+    <Head title="Data Siswa" />
+    <!-- Notifikasi flash sukses -->
     <div
         v-if="page.props.flash?.success"
         class="mb-4 rounded border border-green-300 bg-green-100 px-4 py-2 text-green-800 dark:bg-green-900 dark:text-green-200"
@@ -150,7 +152,6 @@ watch(
             Format file tidak valid. Harus CSV.
         </div>
     </transition>
-
     <AppLayout :breadcrumbs="breadcrumbs">
         <div
             class="flex min-h-screen flex-col gap-6 rounded-xl bg-gradient-to-br from-blue-50 via-white to-blue-100 p-6 font-[Poppins] shadow-lg dark:from-slate-800 dark:via-slate-900 dark:to-slate-800"

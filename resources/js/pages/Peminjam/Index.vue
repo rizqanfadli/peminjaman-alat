@@ -5,7 +5,7 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import { Pencil, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Data Peminjam', href: '/peminjam' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: '', href: '/peminjam' }];
 
 interface Peminjam {
     id: number;
@@ -36,9 +36,13 @@ const startDate = ref('');
 const endDate = ref('');
 const showDateRangeModal = ref(false);
 
+// Tambahkan state untuk sorting
+const sortDirection = ref<'asc' | 'desc'>('desc');
+
+// Modifikasi computed filteredPeminjam
 const filteredPeminjam = computed(() => {
     const keyword = search.value.toLowerCase();
-    return props.peminjam.filter((peminjam) => {
+    let filtered = props.peminjam.filter((peminjam) => {
         const matchesKeyword =
             peminjam.nama_siswa.toLowerCase().includes(keyword) ||
             peminjam.kelas.toLowerCase().includes(keyword) ||
@@ -52,7 +56,23 @@ const filteredPeminjam = computed(() => {
 
         return matchesKeyword && matchesDateRange;
     });
+
+    // Tambahkan sorting
+    filtered.sort((a, b) => {
+        const dateA = new Date(a.tanggal_peminjaman);
+        const dateB = new Date(b.tanggal_peminjaman);
+        return sortDirection.value === 'asc' 
+            ? dateA.getTime() - dateB.getTime()
+            : dateB.getTime() - dateA.getTime();
+    });
+
+    return filtered;
 });
+
+// Tambahkan function untuk toggle sorting
+const toggleSort = () => {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+};
 
 function deleteItem(id: number) {
     if (confirm('Apakah anda yakin akan menghapus ini?')) {
@@ -214,7 +234,16 @@ function applyDateFilter() {
                     <thead class="bg-blue-100 text-blue-700 uppercase dark:bg-slate-700 dark:text-blue-300">
                         <tr>
                             <th class="border border-gray-200 px-6 py-3 text-center dark:border-slate-700">No</th>
-                            <th class="border border-gray-200 px-6 py-3 text-center dark:border-slate-700">Tanggal Peminjaman</th>
+                            <th 
+                                @click="toggleSort"
+                                class="border border-gray-200 px-6 py-3 text-center dark:border-slate-700 cursor-pointer hover:bg-blue-200 dark:hover:bg-slate-600"
+                            >
+                                <div class="flex items-center justify-center gap-1">
+                                    Tanggal Peminjaman
+                                    <span v-if="sortDirection === 'asc'">↑</span>
+                                    <span v-else>↓</span>
+                                </div>
+                            </th>
                             <th class="border border-gray-200 px-6 py-3 text-center dark:border-slate-700">Nama Peminjam</th>
                             <th class="border border-gray-200 px-6 py-3 text-center dark:border-slate-700">Kelas</th>
                             <th class="border border-gray-200 px-6 py-3 text-center dark:border-slate-700">Nama Barang</th>

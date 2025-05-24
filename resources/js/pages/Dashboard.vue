@@ -12,7 +12,7 @@ defineProps<{
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
-  { title: 'Admin', href: '/admin' },
+  { title: '', href: '/admin' },
 ];
 </script>
 
@@ -31,11 +31,11 @@ const breadcrumbs: BreadcrumbItem[] = [
         </div>
 
         <div class="relative aspect-video overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-md transition-all hover:shadow-lg dark:bg-slate-800 dark:border-slate-700">
-          <PlaceholderPattern />
+          <!-- <PlaceholderPattern /> -->
         </div>
 
         <div class="relative aspect-video overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-md transition-all hover:shadow-lg dark:bg-slate-800 dark:border-slate-700">
-          <PlaceholderPattern />
+          <!-- <PlaceholderPattern /> -->
         </div>
       </div>
 
