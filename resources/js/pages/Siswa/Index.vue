@@ -65,11 +65,11 @@ function toggleSelectAll(event: Event) {
     }
 }
 
-function deleteSelectedItems(selectedItems: number[]) {
-    if (selectedItems.length === 0) return;
+function deleteSelectedItems(items: number[]) {
+    if (items.length === 0) return;
 
     if (confirm('Apakah anda yakin akan menghapus item yang dipilih?')) {
-        Promise.all(selectedItems.map((id) => form.delete(route('siswa.destroy', id), { preserveScroll: true }))).then(() => {
+        Promise.all(items.map((id) => form.delete(route('siswa.destroy', id), { preserveScroll: true }))).then(() => {
             selectedItems.value = []; // Clear selected items after deletion
         });
     }

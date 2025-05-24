@@ -15,11 +15,13 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <AppShell variant="sidebar">
-        <AppSidebar />
-        <AppContent variant="sidebar">
-            <AppSidebarHeader :breadcrumbs="breadcrumbs" />
-            <slot />
+    <AppShell variant="sidebar" class="min-h-screen bg-white text-gray-800 transition-colors duration-300 dark:bg-gray-900 dark:text-white">
+        <AppSidebar class="border-r border-gray-200 bg-gray-100 dark:border-gray-700 dark:bg-gray-800" />
+        <AppContent variant="sidebar" class="bg-white dark:bg-gray-900">
+            <AppSidebarHeader :breadcrumbs="breadcrumbs" class="bg-white dark:bg-gray-900" />
+            <div class="p-4">
+                <slot />
+            </div>
         </AppContent>
     </AppShell>
 </template>

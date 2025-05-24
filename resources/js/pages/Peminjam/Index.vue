@@ -35,11 +35,10 @@ const search = ref('');
 const startDate = ref('');
 const endDate = ref('');
 const showDateRangeModal = ref(false);
-
-// Tambahkan state untuk sorting
+const selectedItems = ref<number[]>([]); // Array to hold selected item IDs
 const sortDirection = ref<'asc' | 'desc'>('desc');
 
-// Modifikasi computed filteredPeminjam
+// Computed property for filtered peminjam
 const filteredPeminjam = computed(() => {
     const keyword = search.value.toLowerCase();
     const filtered = props.peminjam.filter((peminjam) => {
@@ -57,31 +56,65 @@ const filteredPeminjam = computed(() => {
         return matchesKeyword && matchesDateRange;
     });
 
-    // Tambahkan sorting
+    // Sorting
     filtered.sort((a, b) => {
         const dateA = new Date(a.tanggal_peminjaman);
         const dateB = new Date(b.tanggal_peminjaman);
-        return sortDirection.value === 'asc' 
-            ? dateA.getTime() - dateB.getTime()
-            : dateB.getTime() - dateA.getTime();
+        return sortDirection.value === 'asc' ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
     });
 
     return filtered;
 });
 
-// Tambahkan function untuk toggle sorting
+// Function to toggle sorting
 const toggleSort = () => {
     sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
 };
 
-function deleteItem(id: number) {
-    if (confirm('Apakah anda yakin akan menghapus ini?')) {
-        form.delete(route('peminjam.destroy', id), {
-            preserveScroll: true,
+// Function to check if a peminjam is selected
+function isSelected(id: number) {
+    return selectedItems.value.includes(id);
+}
+
+// Function to toggle selection of an item
+function toggleSelection(id: number) {
+    const index = selectedItems.value.indexOf(id);
+    if (index > -1) {
+        selectedItems.value.splice(index, 1);
+    } else {
+        selectedItems.value.push(id);
+    }
+}
+
+// Function to select all items
+function toggleSelectAll(event: Event) {
+    const target = event.target as HTMLInputElement;
+    if (target.checked) {
+        selectedItems.value = filteredPeminjam.value.map((peminjam) => peminjam.id);
+    } else {
+        selectedItems.value = [];
+    }
+}
+
+// Function to delete selected items
+function deleteSelectedItems() {
+    if (selectedItems.value.length === 0) return;
+
+    if (confirm('Apakah anda yakin akan menghapus item yang dipilih?')) {
+        Promise.all(selectedItems.value.map((id) => form.delete(route('peminjam.destroy', id), { preserveScroll: true }))).then(() => {
+            selectedItems.value = []; // Clear selected items after deletion
         });
     }
 }
 
+// Function to delete a single item
+function deleteItem(id: number) {
+    if (confirm('Apakah anda yakin akan menghapus ini?')) {
+        form.delete(route('peminjam.destroy', id), { preserveScroll: true });
+    }
+}
+
+// Function to update status
 function updateStatus(id: number, newStatus: string) {
     form.status = newStatus;
     form.patch(route('peminjam.updateStatus', id), {
@@ -90,8 +123,8 @@ function updateStatus(id: number, newStatus: string) {
     });
 }
 
+// Function to export to CSV
 function exportToCSV() {
-    // Header untuk CSV
     const csvHeader = ['No', 'Nama Peminjam', 'Kelas', 'Tanggal Peminjaman', 'Nama Barang', 'Jumlah', 'Keterangan', 'Status'].join(';');
 
     const csvRows = filteredPeminjam.value.map((peminjam, index) => {
@@ -128,12 +161,14 @@ function exportToCSV() {
     document.body.removeChild(link);
 }
 
+// Function to clear date filter
 function clearDateFilter() {
     startDate.value = '';
     endDate.value = '';
     showDateRangeModal.value = false;
 }
 
+// Function to apply date filter
 function applyDateFilter() {
     showDateRangeModal.value = false;
 }
@@ -165,7 +200,6 @@ function applyDateFilter() {
                             Filter Tanggal
                             <span v-if="startDate && endDate" class="text-xs"> ({{ startDate }} - {{ endDate }}) </span>
                         </button>
-
                     </div>
 
                     <div v-if="showDateRangeModal" class="absolute top-12 right-0 z-50">
@@ -233,10 +267,18 @@ function applyDateFilter() {
                 <table class="min-w-full table-auto text-sm text-gray-700 dark:text-gray-200">
                     <thead class="bg-blue-100 text-blue-700 uppercase dark:bg-slate-700 dark:text-blue-300">
                         <tr>
+                            <th class="border border-gray-200 px-6 py-3 text-center dark:border-slate-700">
+                                <input
+                                    type="checkbox"
+                                    @change="toggleSelectAll"
+                                    :checked="selectedItems.length === filteredPeminjam.length && filteredPeminjam.length > 0"
+                                    :indeterminate="selectedItems.length > 0 && selectedItems.length < filteredPeminjam.length"
+                                />
+                            </th>
                             <th class="border border-gray-200 px-6 py-3 text-center dark:border-slate-700">No</th>
-                            <th 
+                            <th
                                 @click="toggleSort"
-                                class="border border-gray-200 px-6 py-3 text-center dark:border-slate-700 cursor-pointer hover:bg-blue-200 dark:hover:bg-slate-600"
+                                class="cursor-pointer border border-gray-200 px-6 py-3 text-center hover:bg-blue-200 dark:border-slate-700 dark:hover:bg-slate-600"
                             >
                                 <div class="flex items-center justify-center gap-1">
                                     Tanggal Peminjaman
@@ -259,6 +301,14 @@ function applyDateFilter() {
                             :key="peminjam.id"
                             class="transition hover:bg-blue-50 dark:hover:bg-slate-700"
                         >
+                            <td class="border border-gray-200 px-6 py-4 text-center align-middle dark:border-slate-700">
+                                <input
+                                    type="checkbox"
+                                    :value="peminjam.id"
+                                    :checked="isSelected(peminjam.id)"
+                                    @change="toggleSelection(peminjam.id)"
+                                />
+                            </td>
                             <td class="border border-gray-200 px-6 py-4 text-center align-middle dark:border-slate-700">{{ index + 1 }}</td>
                             <td class="border border-gray-200 px-6 py-4 text-center align-middle dark:border-slate-700">
                                 {{ peminjam.tanggal_peminjaman }}
@@ -272,24 +322,9 @@ function applyDateFilter() {
                                 {{ peminjam.jumlah_barang }}
                             </td>
                             <td class="border border-gray-200 px-6 py-4 text-center align-middle dark:border-slate-700">{{ peminjam.keterangan }}</td>
+                            <td class="border border-gray-200 px-6 py-4 text-center align-middle dark:border-slate-700">{{ peminjam.status }}</td>
                             <td class="border border-gray-200 px-6 py-4 text-center align-middle dark:border-slate-700">
-                                <select
-                                    :value="peminjam.status"
-                                    @change="updateStatus(peminjam.id, ($event.target as HTMLSelectElement).value)"
-                                    class="rounded-lg border border-gray-300 px-3 py-1 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                                >
-                                    <option
-                                        v-for="option in statusOptions"
-                                        :key="option.value"
-                                        :value="option.value"
-                                        :selected="peminjam.status === option.value"
-                                    >
-                                        {{ option.label }}
-                                    </option>
-                                </select>
-                            </td>
-                            <td class="border border-gray-200 px-6 py-4 text-center align-middle dark:border-slate-700">
-                                <div class="flex items-center justify-center gap-2">
+                                <div v-if="selectedItems.length === 0" class="flex items-center justify-center gap-2">
                                     <Link
                                         :href="`/peminjam/${peminjam.id}/edit`"
                                         class="inline-flex items-center gap-1 rounded bg-yellow-500 px-3 py-1 text-white shadow transition hover:bg-yellow-600 dark:bg-yellow-400 dark:hover:bg-yellow-500"
@@ -303,10 +338,37 @@ function applyDateFilter() {
                                         <Trash2 class="h-4 w-4" /> Hapus
                                     </button>
                                 </div>
+
+                                <div
+                                    v-else-if="selectedItems.length === 1 && selectedItems.includes(peminjam.id)"
+                                    class="flex items-center justify-center gap-2"
+                                >
+                                    <Link
+                                        :href="`/peminjam/${peminjam.id}/edit`"
+                                        class="inline-flex items-center gap-1 rounded bg-yellow-500 px-3 py-1 text-white shadow transition hover:bg-yellow-600 dark:bg-yellow-400 dark:hover:bg-yellow-500"
+                                    >
+                                        <Pencil class="h-4 w-4" /> Edit
+                                    </Link>
+                                    <button
+                                        @click="deleteItem(peminjam.id)"
+                                        class="inline-flex items-center gap-1 rounded bg-red-600 px-3 py-1 text-white shadow transition hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                                    >
+                                        <Trash2 class="h-4 w-4" /> Hapus
+                                    </button>
+                                </div>
+
+                                <div v-else-if="selectedItems.length > 1 && selectedItems.includes(peminjam.id)" class="flex justify-center">
+                                    <button
+                                        @click.prevent="deleteSelectedItems"
+                                        class="inline-flex items-center gap-1 rounded bg-red-600 px-3 py-1 text-white shadow transition hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                                    >
+                                        <Trash2 class="h-4 w-4" /> Hapus Terpilih ({{ selectedItems.length }})
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         <tr v-if="filteredPeminjam.length === 0">
-                            <td colspan="9" class="py-4 text-center text-gray-500 dark:text-gray-400">Tidak ada data ditemukan.</td>
+                            <td colspan="10" class="py-4 text-center text-gray-500 dark:text-gray-400">Tidak ada data ditemukan.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -314,3 +376,14 @@ function applyDateFilter() {
         </div>
     </AppLayout>
 </template>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+</style>
