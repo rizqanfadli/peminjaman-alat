@@ -193,14 +193,14 @@ watch(
                             </td>
                             <td class="border px-6 py-4 align-middle dark:border-slate-700">
                                 <div v-if="selectedItems.length === 0" class="flex items-center justify-center gap-2">
+                                    <Link
+                                        :href="`/barang/${barang.id}/edit`"
+                                        class="inline-flex items-center gap-1 rounded bg-yellow-500 px-3 py-1 text-white shadow transition hover:bg-yellow-600 dark:bg-yellow-400 dark:hover:bg-yellow-500"
+                                    >
+                                        <Pencil class="h-4 w-4" /> Edit
+                                    </Link>
                                     <button
                                         @click.prevent="deleteSelectedItem(barang.id)"
-                                        class="inline-flex items-center gap-1 rounded bg-red-600 px-3 py-1 text-white shadow transition hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-                                    >
-                                        <Trash2 class="h-4 w-4" /> Hapus
-                                    </button>
-                                    <button
-                                        @click.prevent="() => deleteSelectedItem(barang.id)"
                                         class="inline-flex items-center gap-1 rounded bg-red-600 px-3 py-1 text-white shadow transition hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
                                     >
                                         <Trash2 class="h-4 w-4" /> Hapus
