@@ -34,7 +34,6 @@ const search = ref('');
 const fileInput = ref<HTMLInputElement | null>(null);
 const showFileError = ref(false);
 const selectedItems = ref<number[]>([]); // Array to hold selected item IDs
-const selectedItemsRef = selectedItems; // For use in deleteSelectedItems
 
 const filteredSiswa = computed(() => {
     const keyword = search.value.toLowerCase();
@@ -71,8 +70,7 @@ function deleteSelectedItems(selectedItems: number[]) {
 
     if (confirm('Apakah anda yakin akan menghapus item yang dipilih?')) {
         Promise.all(selectedItems.map((id) => form.delete(route('siswa.destroy', id), { preserveScroll: true }))).then(() => {
-            // Clear the main selectedItems ref after deletion
-            ((selectedItemsRef) => (selectedItemsRef.value = []))(selectedItemsRef);
+            selectedItems.value = []; // Clear selected items after deletion
         });
     }
 }
@@ -136,9 +134,9 @@ watch(
 </script>
 
 <template>
-    <!-- Flash success notification -->
     <Head title="Data Siswa" />
-    <!-- Notifikasi flash sukses -->
+
+    <!-- Flash success notification -->
     <div
         v-if="page.props.flash?.success"
         class="mb-4 rounded border border-green-300 bg-green-100 px-4 py-2 text-green-800 dark:bg-green-900 dark:text-green-200"
@@ -152,6 +150,7 @@ watch(
             Format file tidak valid. Harus CSV.
         </div>
     </transition>
+
     <AppLayout :breadcrumbs="breadcrumbs">
         <div
             class="flex min-h-screen flex-col gap-6 rounded-xl bg-gradient-to-br from-blue-50 via-white to-blue-100 p-6 font-[Poppins] shadow-lg dark:from-slate-800 dark:via-slate-900 dark:to-slate-800"
@@ -244,7 +243,7 @@ watch(
                                     </button>
                                 </div>
 
-                                <div v-else-if="selectedItems.length > 1" class="flex justify-center">
+                                <div v-else-if="selectedItems.length > 1 && selectedItems.includes(siswa.id)" class="flex justify-center">
                                     <button
                                         @click.prevent="deleteSelectedItems(selectedItems)"
                                         class="inline-flex items-center gap-1 rounded bg-red-600 px-3 py-1 text-white shadow transition hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
