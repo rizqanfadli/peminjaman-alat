@@ -42,7 +42,7 @@ const sortDirection = ref<'asc' | 'desc'>('desc');
 // Modifikasi computed filteredPeminjam
 const filteredPeminjam = computed(() => {
     const keyword = search.value.toLowerCase();
-    let filtered = props.peminjam.filter((peminjam) => {
+    const filtered = props.peminjam.filter((peminjam) => {
         const matchesKeyword =
             peminjam.nama_siswa.toLowerCase().includes(keyword) ||
             peminjam.kelas.toLowerCase().includes(keyword) ||
