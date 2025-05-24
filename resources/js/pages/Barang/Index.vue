@@ -25,24 +25,52 @@ interface Barang {
     jumlah_barang: number;
 }
 
-const props = defineProps<{
-    data_barang: Barang[];
-}>();
+const props = defineProps<{ data_barang: Barang[] }>();
 
 const form = useForm({});
 const search = ref('');
 const fileInput = ref<HTMLInputElement | null>(null);
 const showFileError = ref(false);
+const selectedItems = ref<number[]>([]); // holds the IDs of selected checkboxes
 
 const filteredBarang = computed(() => {
-    const keyword = search.value.toLowerCase();
+    const keyword = search.value.toLowerCase().trim();
     return props.data_barang.filter((barang) => barang.nama_barang.toLowerCase().includes(keyword));
 });
 
-function deleteItem(id: number) {
-    if (confirm('Apakah anda yakin akan menghapus ini?')) {
-        form.delete(route('barang.destroy', id), {
-            preserveScroll: true,
+// Toggle individual checkbox selection
+function toggleSelection(id: number) {
+    const index = selectedItems.value.indexOf(id);
+    if (index > -1) {
+        selectedItems.value.splice(index, 1);
+    } else {
+        selectedItems.value.push(id);
+    }
+}
+
+// Toggle select all checkbox
+function toggleSelectAll(event: Event) {
+    const target = event.target as HTMLInputElement;
+    if (target.checked) {
+        selectedItems.value = filteredBarang.value.map((barang) => barang.id);
+    } else {
+        selectedItems.value = [];
+    }
+}
+
+// Check if row is selected
+function isSelected(id: number): boolean {
+    return selectedItems.value.includes(id);
+}
+
+// Delete one or multiple selected items
+function deleteSelectedItems(ids: number[]) {
+    if (selectedItems.value.length === 0) return;
+
+    if (confirm('Apakah anda yakin akan menghapus item yang dipilih?')) {
+        // Use Promise.all to wait all deletes finish before clearing selection or reloading
+        Promise.all(selectedItems.value.map((id) => form.delete(route('barang.destroy', id), { preserveScroll: true }))).then(() => {
+            selectedItems.value = [];
         });
     }
 }
@@ -89,7 +117,7 @@ watch(
 </script>
 
 <template>
-    <!-- Notifikasi flash sukses -->
+    <!-- Flash success notification -->
     <div
         v-if="page.props.flash?.success"
         class="mb-4 rounded border border-green-300 bg-green-100 px-4 py-2 text-green-800 dark:bg-green-900 dark:text-green-200"
@@ -97,7 +125,7 @@ watch(
         {{ page.props.flash.success }}
     </div>
 
-    <!-- Notifikasi error file (otomatis hilang) -->
+    <!-- Error notification for file (auto hide) -->
     <transition name="fade">
         <div v-if="showFileError" class="fixed top-6 right-6 z-50 rounded-lg bg-red-600 px-4 py-2 text-sm text-white shadow-md dark:bg-red-500">
             Format file tidak valid. Harus CSV.
@@ -140,6 +168,14 @@ watch(
                 <table class="min-w-full table-auto text-sm text-gray-700 dark:text-gray-200">
                     <thead class="bg-blue-100 text-blue-700 uppercase dark:bg-slate-700 dark:text-blue-300">
                         <tr>
+                            <th class="border px-6 py-3 text-center dark:border-slate-700">
+                                <input
+                                    type="checkbox"
+                                    @change="toggleSelectAll"
+                                    :checked="selectedItems.length === filteredBarang.length && filteredBarang.length > 0"
+                                    :indeterminate="selectedItems.length > 0 && selectedItems.length < filteredBarang.length"
+                                />
+                            </th>
                             <th class="border px-6 py-3 text-center dark:border-slate-700">No</th>
                             <th class="border px-6 py-3 text-center dark:border-slate-700">Nama Barang</th>
                             <th class="border px-6 py-3 text-center dark:border-slate-700">Jumlah</th>
@@ -148,13 +184,17 @@ watch(
                     </thead>
                     <tbody>
                         <tr v-for="(barang, index) in filteredBarang" :key="barang.id" class="transition hover:bg-blue-50 dark:hover:bg-slate-700">
+                            <td class="border px-6 py-4 text-center align-middle dark:border-slate-700">
+                                <input type="checkbox" :value="barang.id" :checked="isSelected(barang.id)" @change="toggleSelection(barang.id)" />
+                            </td>
                             <td class="border px-6 py-4 text-center align-middle dark:border-slate-700">{{ index + 1 }}</td>
                             <td class="border px-6 py-4 text-center align-middle dark:border-slate-700">{{ barang.nama_barang }}</td>
                             <td class="border px-6 py-4 text-center align-middle dark:border-slate-700">
                                 {{ barang.jumlah_barang }}
                             </td>
-                            <td class="border px-6 py-4 text-center align-middle dark:border-slate-700">
-                                <div class="flex items-center justify-center gap-2">
+                            <td class="border px-6 py-4 align-middle dark:border-slate-700">
+                                <div v-if="selectedItems.length === 0" class="flex items-center justify-center gap-2">
+                                    <!-- No checkbox selected: show edit and delete per-row -->
                                     <Link
                                         :href="`/barang/${barang.id}/edit`"
                                         class="inline-flex items-center gap-1 rounded bg-yellow-500 px-3 py-1 text-white shadow transition hover:bg-yellow-600 dark:bg-yellow-400 dark:hover:bg-yellow-500"
@@ -162,16 +202,46 @@ watch(
                                         <Pencil class="h-4 w-4" /> Edit
                                     </Link>
                                     <button
-                                        @click="deleteItem(barang.id)"
+                                        @click.prevent="deleteSelectedItems([barang.id])"
                                         class="inline-flex items-center gap-1 rounded bg-red-600 px-3 py-1 text-white shadow transition hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
                                     >
                                         <Trash2 class="h-4 w-4" /> Hapus
                                     </button>
                                 </div>
+
+                                <div
+                                    v-else-if="selectedItems.length === 1 && selectedItems.includes(barang.id)"
+                                    class="flex items-center justify-center gap-2"
+                                >
+                                    <!-- One checkbox selected and matches this row: show edit and delete -->
+                                    <Link
+                                        :href="`/barang/${barang.id}/edit`"
+                                        class="inline-flex items-center gap-1 rounded bg-yellow-500 px-3 py-1 text-white shadow transition hover:bg-yellow-600 dark:bg-yellow-400 dark:hover:bg-yellow-500"
+                                    >
+                                        <Pencil class="h-4 w-4" /> Edit
+                                    </Link>
+                                    <button
+                                        @click.prevent="deleteSelectedItems([barang.id])"
+                                        class="inline-flex items-center gap-1 rounded bg-red-600 px-3 py-1 text-white shadow transition hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                                    >
+                                        <Trash2 class="h-4 w-4" /> Hapus
+                                    </button>
+                                </div>
+
+                                <div v-else-if="selectedItems.length > 1" class="flex justify-center">
+                                    <!-- More than one checkbox selected: show only centralized delete -->
+                                    <button
+                                        @click.prevent="deleteSelectedItems(selectedItems)"
+                                        class="inline-flex items-center gap-1 rounded bg-red-600 px-3 py-1 text-white shadow transition hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                                    >
+                                        <Trash2 class="h-4 w-4" /> Hapus Terpilih ({{ selectedItems.length }})
+                                    </button>
+                                </div>
                             </td>
                         </tr>
+
                         <tr v-if="filteredBarang.length === 0">
-                            <td colspan="4" class="py-4 text-center text-gray-500 dark:text-gray-400">Tidak ada data ditemukan.</td>
+                            <td colspan="5" class="py-4 text-center text-gray-500 dark:text-gray-400">Tidak ada data ditemukan.</td>
                         </tr>
                     </tbody>
                 </table>

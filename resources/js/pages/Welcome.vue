@@ -291,7 +291,7 @@ onUnmounted(() => {
                         </div>
 
                         <div>
-                            <Label for="nama_siswa">Nama Peminjam</Label>
+                            <Label for="nama_siswa">Nama Peminjam (Pilih kelas dulu)</Label>
                             <div class="relative">
                                 <input
                                     id="nama_siswa_input"
