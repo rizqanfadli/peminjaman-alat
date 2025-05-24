@@ -4,9 +4,11 @@ import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import PlaceholderPattern from '../components/PlaceholderPattern.vue';
 import ActiveBorrowersWidget from '../components/ActiveBorrowersWidget.vue';
+import BorrowersChartWidget from '../components/BorrowersChartWidget.vue';
 
 defineProps<{
-  activeBorrowers: number
+  activeBorrowers: number,
+  monthlyBorrowers: { month: string; count: number; }[]
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -39,7 +41,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
       <!-- Panel Besar -->
       <div class="relative min-h-[400px] rounded-2xl border border-blue-200 bg-white p-4 shadow-md transition-all hover:shadow-lg dark:bg-slate-800 dark:border-slate-700">
-        <PlaceholderPattern />
+        <BorrowersChartWidget :monthly-data="monthlyBorrowers" />
       </div>
     </div>
   </AppLayout>

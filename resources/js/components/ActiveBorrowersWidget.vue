@@ -19,13 +19,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="h-full p-6 bg-white">
+  <div class="w-full h-full p-4 rounded-xl bg-white text-blue-800 border border-blue-200 dark:bg-slate-800 dark:text-white dark:border-slate-700">
     <div class="flex flex-col h-full justify-between">
       <div>
-        <h3 class="text-gray-600 text-sm font-medium mb-2">Total Peminjam Aktif</h3>
+        <h3 class=" text-sm font-medium mb-2">Total Peminjam Aktif</h3>
         <div class="flex items-baseline">
           <span class="text-6xl font-bold text-blue-600">{{ borrowersCount }}</span>
-          <span class="ml-2 text-gray-500 text-sm">peminjam</span>
+          <span class="ml-2 text-sm">peminjam</span>
         </div>
       </div>
       

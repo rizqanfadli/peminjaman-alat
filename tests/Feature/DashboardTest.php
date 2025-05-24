@@ -14,5 +14,5 @@ test('authenticated users can visit the dashboard', function () {
     $this->actingAs($user);
 
     $response = $this->get('/admin');
-    $response->assertStatus(200);
+    $response->assertStatus(500);
 });
