@@ -5,7 +5,7 @@ import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { Pencil, Trash2 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Data Siswa', href: '/siswa' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: '', href: '/siswa' }];
 
 interface FlashProps {
     success?: string;

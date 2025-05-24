@@ -12,7 +12,7 @@ defineProps<{
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
-  { title: 'Admin', href: '/admin' },
+  { title: '', href: '/admin' },
 ];
 </script>
 

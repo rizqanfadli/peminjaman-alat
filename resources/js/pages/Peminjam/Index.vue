@@ -5,7 +5,7 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import { Pencil, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Data Peminjam', href: '/peminjam' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: '', href: '/peminjam' }];
 
 interface Peminjam {
     id: number;
