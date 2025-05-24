@@ -34,3 +34,7 @@ Route::get('/data_siswa', function () {
     return response()->json(['success' => true]);
 });
 Route::patch('peminjam/{peminjam}/update-status', [PeminjamController::class, 'updateStatus'])->name('peminjam.updateStatus');
+
+Route::post('/barang/import', [BarangController::class, 'import'])->name('barang.import');
+Route::post('/siswa/import', [SiswaController::class, 'import'])->name('siswa.import');
+
